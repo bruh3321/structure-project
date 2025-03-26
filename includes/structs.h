@@ -7,7 +7,7 @@ typedef struct{
     int annee;
     int nbExemplaires;
     int nbExemplairesDisponibles;
-    livre *suivant;
+//    livre *suivant;
 }livre;
 
 typedef struct{
@@ -15,6 +15,6 @@ typedef struct{
     char nom[30];
     char CNIE[30];
 //    char num[30];
-    etudiant *suivant;
+//    etudiant *suivant;
 }etudiant;
 
