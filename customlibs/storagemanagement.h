@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "structs.h"
+#include <stdlib.h>
 
 int num_livres(char *name) {
     FILE *pf=fopen(name,"r");
@@ -20,7 +21,7 @@ int num_livres(char *name) {
 int livre_read(char *name) {
     FILE *pf=fopen(name,"r");
     int n = num_livres(name), i = 0; // nombre de livres
-    livre livres[] = (livre *)malloc(n*sizeof(livre));
+    livre *livres = (livre *)malloc(n * sizeof(livre));
     if (pf==NULL) {
         printf("Erreur d'ouverture du fichier %s\n",name);
         return 0;

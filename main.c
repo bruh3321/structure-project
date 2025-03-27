@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "storagemanagement.h"
-#include "structs.h"
+#include "customlibs/storagemanagement.h"
+#include "customlibs/structs.h"
 #define TRUE 1
 #define FALSE 0
 #define MAX 80
