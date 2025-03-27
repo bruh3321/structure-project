@@ -5,25 +5,22 @@
 #include "storagemanagement.h"
 #include "structs.h"
 
-int chargerLivres(const char* filename) {
+int chargerLivres(const char* filename, Livre *livres, int *total) {
+    *total = 0;
     FILE *fichier = fopen(filename, "r");
-    if (!fichier) {
-        return 0;
-    }
+    if (!fichier) return 0;
 
-    Livre l;
-    int w=3,h=3, indicateur=1;
-    while(fscanf(fichier, "%s %s %s %d %d %d", 
-               l.code, l.titre, l.auteur, 
-               &l.annee, &l.nbExemplaires, 
-               &l.nbExemplairesDisponibles) != EOF) {
-        // Logique d'affichage des livres
-            mvprintw(w, h, "%d Code : %s \n Titre: %s \n Auteur %s \n Annee: %d \n Nombre d'exemplaire: %d \n Nombre d'exemplaire disp. :%d", 
-               indicateur,l.code, l.titre, l.auteur, 
-               l.annee, l.nbExemplaires, 
-               l.nbExemplairesDisponibles);
-            w+=7;
-            indicateur++;
+    char line[256];
+    while(fgets(line, sizeof(line), fichier) && *total < MAX_LIVRES) {
+        if(sscanf(line, "%s %s %s %d %d %d", 
+               livres[*total].code, 
+               livres[*total].titre, 
+               livres[*total].auteur,
+               &livres[*total].annee, 
+               &livres[*total].nbExemplaires, 
+               &livres[*total].nbExemplairesDisponibles) == 6) {
+            (*total)++;
+        }
     }
     fclose(fichier);
     return 1;

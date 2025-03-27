@@ -4,6 +4,9 @@
 
 #define MAX_SAISIE 100
 
+Livre livres[MAX_LIVRES];
+int total_livres = 0;
+int start_index = 0;
 WINDOW *creerFenetre(int hauteur, int largeur, int y, int x);
 void afficherMenuPrincipal();
 void gererSaisieLivre();
@@ -103,11 +106,40 @@ void gererSaisieLivre() {
 }
 
 void afficherListeLivres() {
-    clear();
-    mvprintw(2, 35, "LISTE DES LIVRES");
-    chargerLivres("livres.txt");
-    mvprintw(23, 2, "Appuyez sur R pour revenir au menu principal");
+    int ch;
+    chargerLivres("livres.txt", livres, &total_livres);
     
-    refresh();
-    getch();
+    do {
+        clear();
+        mvprintw(2, 35, "LISTE DES LIVRES (%d/%d)", start_index + 1, total_livres);
+        
+        int max_lines = LINES - 6;
+        for(int i = 0; i < max_lines && (i + start_index) < total_livres; i++) {
+            Livre *l = &livres[i + start_index];
+            mvprintw(5 + i, 3, "%s - %s (%s) | Disp: %d/%d", 
+                    l->code, l->titre, l->auteur, 
+                    l->nbExemplairesDisponibles, l->nbExemplaires);
+        }
+        
+        mvprintw(LINES - 2, 2, "↑/↓: Défilement | R: Retour");
+        refresh();
+        
+        ch = getch();
+        switch(ch) {
+            case KEY_DOWN:
+                if(start_index < total_livres - 1) start_index++;
+                break;
+            case KEY_UP:
+                if(start_index > 0) start_index--;
+                break;
+            case KEY_NPAGE: // Page down
+                start_index += max_lines;
+                if(start_index >= total_livres) start_index = total_livres - 1;
+                break;
+            case KEY_PPAGE: // Page up
+                start_index -= max_lines;
+                if(start_index < 0) start_index = 0;
+                break;
+        }
+    } while(ch != 'R' && ch != 'r');
 }
