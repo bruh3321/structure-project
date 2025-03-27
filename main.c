@@ -33,7 +33,7 @@ int main() {
                 afficherListeLivres();
                 break;
             case '3':
-                // Fonction d'emprunt
+                // Emprunter un livre
                 break;
             case 'q':
                 break;
@@ -90,7 +90,7 @@ void gererSaisieLivre() {
     
     nouveau.nbExemplairesDisponibles = nouveau.nbExemplaires;
     
-    if(sauvegarderLivre("data/livres.txt", &nouveau)) {
+    if(sauvegarderLivre("livres.txt", &nouveau)) {
         mvprintw(23, 2, "Livre enregistré avec succès !");
     }
     
@@ -102,7 +102,7 @@ void gererSaisieLivre() {
 void afficherListeLivres() {
     clear();
     mvprintw(2, 35, "LISTE DES LIVRES");
-    chargerLivres("data/livres.txt");
+    chargerLivres("livres.txt");
     mvprintw(23, 2, "Appuyez sur une touche pour continuer...");
     refresh();
     getch();
