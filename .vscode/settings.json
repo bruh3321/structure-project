@@ -2,6 +2,7 @@
     "files.associations": {
         "system_error": "c",
         "ncurses.h": "c",
-        "curses.h": "c"
+        "curses.h": "c",
+        "storagemanagement.h": "c"
     }
 }

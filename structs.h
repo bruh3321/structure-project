@@ -7,7 +7,7 @@ typedef struct {
     char auteur[50];
     int annee;
     int nbExemplaires;
-    int nbExemplairesDisponibles;
+    int nbExemplairesDisponibles = 1;
 } Livre;
 
 typedef struct {
