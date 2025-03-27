@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "system_error": "c"
+        "system_error": "c",
+        "ncurses.h": "c",
+        "curses.h": "c"
     }
 }
