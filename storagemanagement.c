@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ncurses.h>
+#include <curses.h>
 #include "storagemanagement.h"
 #include "structs.h"
 
@@ -49,7 +49,9 @@ int rechercherLivre(const char* filename, const char* critere) {
 
 int emprunterLivre(const char* filename, const char* cnie, const char* codeLivre) {
     // Logique d'emprunt
-    FILE *fichier = fopen(*filename, "r+");
+    FILE *fichier = fopen("emprunt.txt", "r+");
+
+    FILE *tmp = fopen("tmp.txt", "a+");
     Livre livre;
     if (!fichier) return 0;
 
@@ -61,17 +63,26 @@ int emprunterLivre(const char* filename, const char* cnie, const char* codeLivre
                &livre.annee, 
                &livre.nbExemplaires, 
                &livre.nbExemplairesDisponibles);
-        if (strcmp(livre.code, codeLivre) == 0){ 
-           fseek(fichier, -1,SEEK_CUR);
-           fprintf(fichier, "%s %s %s %d %d %d\n", 
+        if (strcmp(livre.code, codeLivre) != 0){ 
+           fprintf(tmp, "%s %s %s %d %d %d\n", 
                livre.code, 
                livre.titre, 
                livre.auteur,
                livre.annee, 
                livre.nbExemplaires, 
-               livre.nbExemplairesDisponibles - 1: livre.nbExemplairesDisponibles >=0? 0); 
-            fseek(fichier, 0, SEEK_CUR);
-            fclose(fichier);   
+               livre.nbExemplairesDisponibles);
+        }else{
+            fprintf(tmp, "%s %s %s %d %d %d\n", 
+                livre.code, 
+                livre.titre, 
+                livre.auteur,
+                livre.annee, 
+                livre.nbExemplaires, 
+                livre.nbExemplairesDisponibles--);
+        }
+        remove("emprunt.txt");
+        rename("tmp.txt", "emprunt.txt");
+        fclose(tmp);   
     }
     
 
