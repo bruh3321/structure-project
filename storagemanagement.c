@@ -37,7 +37,7 @@ int sauvegarderLivre(const char* filename, Livre *l) {
     return 1;
 }
 
-// Ajoutez ces nouvelles fonctions
+
 int rechercherLivre(const char* filename, const char* critere) {
     // Implémentez la recherche
     return 1;
