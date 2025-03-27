@@ -49,6 +49,43 @@ int rechercherLivre(const char* filename, const char* critere) {
 
 int emprunterLivre(const char* filename, const char* cnie, const char* codeLivre) {
     // Logique d'emprunt
+    FILE *fichier = fopen("emprunt.txt", "r+");
+
+    FILE *tmp = fopen("tmp.txt", "a+");
+    Livre livre;
+    if (!fichier) return 0;
+
+    while (feof(fichier)){
+        fscanf(fichier, "%s %s %s %d %d %d", 
+               livre.code, 
+               livre.titre, 
+               livre.auteur,
+               &livre.annee, 
+               &livre.nbExemplaires, 
+               &livre.nbExemplairesDisponibles);
+        if (strcmp(livre.code, codeLivre) != 0){ 
+           fprintf(tmp, "%s %s %s %d %d %d\n", 
+               livre.code, 
+               livre.titre, 
+               livre.auteur,
+               livre.annee, 
+               livre.nbExemplaires, 
+               livre.nbExemplairesDisponibles);
+        }else{
+            fprintf(tmp, "%s %s %s %d %d %d\n", 
+                livre.code, 
+                livre.titre, 
+                livre.auteur,
+                livre.annee, 
+                livre.nbExemplaires, 
+                livre.nbExemplairesDisponibles--);
+        }
+        remove("emprunt.txt");
+        rename("tmp.txt", "emprunt.txt");
+        fclose(tmp);   
+    }
+    
+
     return 1;
 }
 
