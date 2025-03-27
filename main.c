@@ -14,6 +14,7 @@ int main() {
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
+    scrollok(stdscr, TRUE);
     curs_set(0);
     start_color();
 
@@ -105,7 +106,8 @@ void afficherListeLivres() {
     clear();
     mvprintw(2, 35, "LISTE DES LIVRES");
     chargerLivres("livres.txt");
-    mvprintw(23, 2, "Appuyez sur une touche pour continuer...");
+    mvprintw(23, 2, "Appuyez sur R pour revenir au menu principal");
+    
     refresh();
     getch();
 }
