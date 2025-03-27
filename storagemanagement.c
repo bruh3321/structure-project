@@ -12,11 +12,16 @@ int chargerLivres(const char* filename) {
     }
 
     Livre l;
+    int w=3,h=3;
     while(fscanf(fichier, "%s %s %s %d %d %d", 
                l.code, l.titre, l.auteur, 
                &l.annee, &l.nbExemplaires, 
                &l.nbExemplairesDisponibles) != EOF) {
         // Logique d'affichage
+            mvprintw(w, h, "%s %s %s %d %d %d", 
+               l.code, l.titre, l.auteur, 
+               l.annee, l.nbExemplaires, 
+               l.nbExemplairesDisponibles);
     }
     fclose(fichier);
     return 1;

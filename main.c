@@ -92,6 +92,8 @@ void gererSaisieLivre() {
     
     if(sauvegarderLivre("livres.txt", &nouveau)) {
         mvprintw(23, 2, "Livre enregistré avec succès !");
+    }else {
+        mvprintw(23, 2, "Erreur lors de l'enregistrement !");
     }
     
     noecho();
