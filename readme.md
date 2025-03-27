@@ -10,5 +10,5 @@ to run on windows
 ```
 on mac
 ```
-
+    gcc main.c storagemanagement.c -lncurses -o bibliotheque
 ```
