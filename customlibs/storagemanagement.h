@@ -1,16 +1,37 @@
 #include <stdio.h>
 #include "structs.h"
 
-int livre_read(char *name) {
+int num_livres(char *name) {
     FILE *pf=fopen(name,"r");
     if (pf==NULL) {
         printf("Erreur d'ouverture du fichier %s\n",name);
         return 0;
     }
+    int num=0;
+    while(!feof(pf)) {
+        livre l;
+        fscanf(pf,"%s %s %s %d %d %d\n",l.code,l.titre,l.auteur,&l.annee,&l.nbExemplaires,&l.nbExemplairesDisponibles);
+        num++;
+    }
+    fclose(pf);
+    return num;
+}
+
+int livre_read(char *name) {
+    FILE *pf=fopen(name,"r");
+    int n = num_livres(name), i = 0; // nombre de livres
+    livre livres[] = (livre *)malloc(n*sizeof(livre));
+    if (pf==NULL) {
+        printf("Erreur d'ouverture du fichier %s\n",name);
+        return 0;
+    }
+
     while(!feof(pf)) {
         livre l;
         fscanf(pf,"%s %s %s %d %d %d\n",l.code,l.titre,l.auteur,&l.annee,&l.nbExemplaires,&l.nbExemplairesDisponibles);
         printf("%s %s %s %d %d %d\n",l.code,l.titre,l.auteur,l.annee,l.nbExemplaires,l.nbExemplairesDisponibles);
+        livres[i] = l;
+        i++;
     }
     return 1;
 }
