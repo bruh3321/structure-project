@@ -11,6 +11,7 @@ WINDOW *creerFenetre(int hauteur, int largeur, int y, int x);
 void afficherMenuPrincipal();
 void gererSaisieLivre();
 void afficherListeLivres();
+void emprunterLivreGUI();
 
 int main() {
     initscr();
@@ -38,6 +39,7 @@ int main() {
                 break;
             case '3':
                 // Emprunter un livre
+                emprunterLivreGUI();
                 break;
             case 'q':
                 break;
@@ -86,7 +88,7 @@ void gererSaisieLivre() {
     mvprintw(7, 10, "Auteur : ");
     getnstr(nouveau.auteur, 49);
     
-    mvprintw(8, 10, "Année : ");
+    mvprintw(8, 10, "Annee : ");
     scanw("%d", &nouveau.annee);
     
     mvprintw(9, 10, "Exemplaires : ");
@@ -95,7 +97,7 @@ void gererSaisieLivre() {
     nouveau.nbExemplairesDisponibles = nouveau.nbExemplaires;
     
     if(sauvegarderLivre("livres.txt", &nouveau)) {
-        mvprintw(23, 2, "Livre enregistré avec succès !");
+        mvprintw(23, 2, "Livre enregistre avec succes !");
     }else {
         mvprintw(23, 2, "Erreur lors de l'enregistrement !");
     }
@@ -121,7 +123,7 @@ void afficherListeLivres() {
                     l->nbExemplairesDisponibles, l->nbExemplaires);
         }
         
-        mvprintw(LINES - 2, 2, "↑/↓: Défilement | R: Retour");
+        mvprintw(LINES - 2, 2, "↑/↓: Defilement | R: Retour");
         refresh();
         
         ch = getch();
@@ -142,4 +144,33 @@ void afficherListeLivres() {
                 break;
         }
     } while(ch != 'R' && ch != 'r');
+}
+
+void emprunterLivreGUI(){
+    clear();
+    char codeLivre[MAX_SAISIE];
+    Etudiant etd;
+    echo();
+    curs_set(1);
+    mvprintw(2, 30, "EMPRUNT DE LIVRE");
+    mvprintw(5, 10, "Code du livre : ");
+    getnstr(codeLivre, 9); // 9 : the first 4 chars and the othor 5 numbers
+
+    mvprintw(7, 10, "CNIE :");
+    getnstr(etd.CNIE, 14); // 14 is too much but just in case
+
+    mvprintw(9, 10, "Nom : ");
+    getnstr(etd.nom, 30);
+
+    mvprintw(11, 10, "Prenom : ");
+    getnstr(etd.prenom, 30);
+    
+    if(!emprunterLivre(&etd, codeLivre)){ // emprunterLivre returns 0 if the operation is successful
+        mvprintw(23, 4, "Emprunt effectue avec succes !");
+    }else{
+        mvprintw(23, 4, "Erreur lors de l'emprunt !");
+    }
+    noecho();
+    curs_set(0);
+    getch();
 }

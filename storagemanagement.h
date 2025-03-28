@@ -5,8 +5,8 @@
 
 int chargerLivres(const char* filename, Livre* livres, int* total);
 int sauvegarderLivre(const char* filename, Livre* l);
-int rechercherLivre(const char* filename, const char* critere);
-int emprunterLivre(const char* filename, const char* cnie, const char* codeLivre);
+int rechercherLivre(const char* filename, const char* critere, const int type);
+int emprunterLivre(Etudiant* etudiant, const char* codeLivre);
 int rendreLivre(const char* filename, const char* codeLivre);
 
 #endif
