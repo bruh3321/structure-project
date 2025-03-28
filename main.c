@@ -149,7 +149,7 @@ void afficherListeLivres() {
 void emprunterLivreGUI(){
     clear();
     char codeLivre[MAX_SAISIE];
-    char cnie[MAX_SAISIE];
+    Etudiant etd;
     echo();
     curs_set(1);
     mvprintw(2, 30, "EMPRUNT DE LIVRE");
@@ -157,12 +157,18 @@ void emprunterLivreGUI(){
     getnstr(codeLivre, 9); // 9 : the first 4 chars and the othor 5 numbers
 
     mvprintw(7, 10, "CNIE :");
-    getnstr(cnie, 14); // 14 is too much but just in case
+    getnstr(etd.CNIE, 14); // 14 is too much but just in case
 
-    if(!emprunterLivre(cnie, codeLivre)){ // emprunterLivre returns 0 if the operation is successful
-        mvprintw(23, 2, "Emprunt effectue avec succes !");
+    mvprintw(9, 10, "Nom : ");
+    getnstr(etd.nom, 30);
+
+    mvprintw(11, 10, "Prenom : ");
+    getnstr(etd.prenom, 30);
+    
+    if(!emprunterLivre(&etd, codeLivre)){ // emprunterLivre returns 0 if the operation is successful
+        mvprintw(23, 4, "Emprunt effectue avec succes !");
     }else{
-        mvprintw(23, 2, "Erreur lors de l'emprunt !");
+        mvprintw(23, 4, "Erreur lors de l'emprunt !");
     }
     noecho();
     curs_set(0);

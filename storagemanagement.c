@@ -47,13 +47,13 @@ int rechercherLivre(const char* filename, const char* critere, const int type) {
     return 1;
 }
 
-int emprunterLivre(const char* cnie, const char* codeLivre) {
-    // Logique d'emprunt
+int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
+    // livre emprunt section
     FILE *fichier = fopen("livres.txt", "r");
 
     FILE *tmp = fopen("tmp.txt", "w");
     Livre livre;
-    if (!fichier) return 0;
+    if (!fichier) return 1;
     int state = 0;
     while (!feof(fichier)){
         fscanf(fichier, "%s %s %s %d %d %d\n", 
@@ -99,7 +99,90 @@ int emprunterLivre(const char* cnie, const char* codeLivre) {
     remove("livres.txt");
     rename("tmp.txt", "livres.txt"); 
 
-    
+    // etudiant emprunt section
+    Etudiant etd;
+    FILE *etd_emprunt = fopen("emprunts.txt", "a+");
+    FILE *etd_emprunt_tmp = fopen("tmp_emprunt.txt", "w");
+    if (!etd_emprunt) return 1;
+    int is_presnt = 0;
+    while(!feof(etd_emprunt)){
+        fscanf(etd_emprunt,"%s %s %s %s %s %s %s %s %s %s\n", 
+               etd.prenom, 
+               etd.nom, 
+               etd.CNIE,
+               etd.emtprunts[0], 
+               etd.emtprunts[1], 
+               etd.emtprunts[2],
+               etd.emtprunts[3], 
+               etd.emtprunts[4], 
+               etd.emtprunts[5],
+               etd.emtprunts[6],
+               etd.emtprunts[7], 
+               etd.emtprunts[8], 
+               etd.emtprunts[9]);
+        
+        if(strcmp(etd.CNIE, etudiant->CNIE) == 0){
+            for(int i =0; i < 10;i++){
+                if(strcmp(etd.emtprunts[i], "") == 0){
+                    strcat(etd.emtprunts[i], codeLivre);;
+                    break;
+                }
+            
+            fprintf(etd_emprunt_tmp, "%s %s %s %s %s %s %s %s %s %s\n", 
+                    etd.prenom, 
+                    etd.nom, 
+                    etd.CNIE,
+                    etd.emtprunts[0], 
+                    etd.emtprunts[1], 
+                    etd.emtprunts[2],
+                    etd.emtprunts[3], 
+                    etd.emtprunts[4], 
+                    etd.emtprunts[5],
+                    etd.emtprunts[6],
+                    etd.emtprunts[7], 
+                    etd.emtprunts[8], 
+                    etd.emtprunts[9]);
+            }
+            is_presnt = 1;
+        }else{
+            fprintf(etd_emprunt_tmp, "%s %s %s %s %s %s %s %s %s %s\n", 
+                    etd.prenom, 
+                    etd.nom, 
+                    etd.CNIE,
+                    etd.emtprunts[0], 
+                    etd.emtprunts[1], 
+                    etd.emtprunts[2],
+                    etd.emtprunts[3], 
+                    etd.emtprunts[4], 
+                    etd.emtprunts[5],
+                    etd.emtprunts[6],
+                    etd.emtprunts[7], 
+                    etd.emtprunts[8], 
+                    etd.emtprunts[9]);
+        }
+    }
+    fclose(etd_emprunt);
+    fclose(etd_emprunt_tmp);
+    remove("emprunts.txt");
+    rename("tmp_emprunt.txt", "emprunts.txt");
+    FILE *etd_emprunt_final = fopen("emprunts.txt", "a");
+    if (!etd_emprunt_final) return 1;
+    if(!is_presnt){
+        fprintf(etd_emprunt_final, "%s %s %s %s %s %s %s %s %s %s\n", 
+                etudiant->prenom, 
+                etudiant->nom, 
+                etudiant->CNIE,
+                codeLivre, 
+                etudiant->emtprunts[1], 
+                etudiant->emtprunts[2],
+                etudiant->emtprunts[3], 
+                etudiant->emtprunts[4], 
+                etudiant->emtprunts[5],
+                etudiant->emtprunts[6],
+                etudiant->emtprunts[7], 
+                etudiant->emtprunts[8], 
+                etudiant->emtprunts[9]);
+    }
 
     return state;
 }
