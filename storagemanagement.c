@@ -149,7 +149,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
                 }
             }
             if (!added) {
-                printf("Error: Student has reached maximum number of borrowed books\n");
+                printf("Erreur: l'etudiant a emprunté le maximum de livres possible \n");
                 // Handle error case here
             }
         }
