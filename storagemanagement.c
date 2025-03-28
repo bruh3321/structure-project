@@ -42,64 +42,66 @@ int sauvegarderLivre(const char* filename, Livre *l) {
 }
 
 
-int rechercherLivre(const char* filename, const char* critere) {
-    // Implémentez la recherche
+int rechercherLivre(const char* filename, const char* critere, const int type) {
+    // TO-DO : Implémentez la recherche
     return 1;
 }
 
 int emprunterLivre(const char* cnie, const char* codeLivre) {
     // Logique d'emprunt
-    FILE *fichier = fopen("emprunt.txt", "r+");
+    FILE *fichier = fopen("livres.txt", "r");
 
-    FILE *tmp = fopen("tmp.txt", "a+");
+    FILE *tmp = fopen("tmp.txt", "w");
     Livre livre;
     if (!fichier) return 0;
-
-    while (feof(fichier)){
-        fscanf(fichier, "%s %s %s %d %d %d", 
+    int state = 0;
+    while (!feof(fichier)){
+        fscanf(fichier, "%s %s %s %d %d %d\n", 
                livre.code, 
                livre.titre, 
                livre.auteur,
                &livre.annee, 
                &livre.nbExemplaires, 
                &livre.nbExemplairesDisponibles);
-        if (strcmp(livre.code, codeLivre) != 0){ 
-           fprintf(tmp, "%s %s %s %d %d %d\n", 
+        if(strcmp(livre.code, codeLivre) == 0){ 
+                if(livre.nbExemplairesDisponibles > 0){
+                    fprintf(tmp, "%s %s %s %d %d %d\n", 
+                        livre.code, 
+                        livre.titre, 
+                        livre.auteur,
+                        livre.annee, 
+                        livre.nbExemplaires, 
+                        --livre.nbExemplairesDisponibles
+                        );
+                }else{
+                    fprintf(tmp, "%s %s %s %d %d %d\n", 
+                            livre.code, 
+                            livre.titre, 
+                            livre.auteur,
+                            livre.annee, 
+                            livre.nbExemplaires, 
+                            livre.nbExemplairesDisponibles
+                        );
+                        state = 1;
+                    }
+        }else{
+            fprintf(tmp, "%s %s %s %d %d %d\n", 
                livre.code, 
                livre.titre, 
                livre.auteur,
                livre.annee, 
                livre.nbExemplaires, 
                livre.nbExemplairesDisponibles);
-        }else{
-            if(livre.nbExemplairesDisponibles > 0){
-                fprintf(tmp, "%s %s %s %d %d %d\n", 
-                livre.code, 
-                livre.titre, 
-                livre.auteur,
-                livre.annee, 
-                livre.nbExemplaires, 
-                livre.nbExemplairesDisponibles--);
-                return 0;
-            }else{
-                fprintf(tmp, "%s %s %s %d %d %d\n", 
-                    livre.code, 
-                    livre.titre, 
-                    livre.auteur,
-                    livre.annee, 
-                    livre.nbExemplaires, 
-                    livre.nbExemplairesDisponibles);
-                return 1;
-            }
-
         }
-        remove("emprunt.txt");
-        rename("tmp.txt", "emprunt.txt");
-        fclose(tmp);   
     }
+    fclose(fichier);
+    fclose(tmp);
+    remove("livres.txt");
+    rename("tmp.txt", "livres.txt"); 
+
     
 
-    return 1;
+    return state;
 }
 
 int rendreLivre(const char* filename, const char* codeLivre) {

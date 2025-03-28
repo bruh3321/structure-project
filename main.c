@@ -156,7 +156,7 @@ void emprunterLivreGUI(){
     mvprintw(5, 10, "Code du livre : ");
     getnstr(codeLivre, 9); // 9 : the first 4 chars and the othor 5 numbers
 
-    mvprintw(5, 10, "CNIE :");
+    mvprintw(7, 10, "CNIE :");
     getnstr(cnie, 14); // 14 is too much but just in case
 
     if(!emprunterLivre(cnie, codeLivre)){ // emprunterLivre returns 0 if the operation is successful
@@ -164,4 +164,7 @@ void emprunterLivreGUI(){
     }else{
         mvprintw(23, 2, "Erreur lors de l'emprunt !");
     }
+    noecho();
+    curs_set(0);
+    getch();
 }
