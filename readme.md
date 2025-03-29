@@ -8,7 +8,7 @@ to run on windows
 ```
     gcc main.c storagemanagement.c -I ".\include\" -L ".\lib\" -l:pdcurses.a -o bibliotheque
 ```
-on mac
+on mac/linux
 ```
     gcc main.c storagemanagement.c -lncurses -o bibliotheque
 ```
