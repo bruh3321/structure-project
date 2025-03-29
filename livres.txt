@@ -1,3 +1,0 @@
-0 test bakali 2024 2 0
-1 23 bakai 1212 1 0
-hello test yes 1234 2 1
