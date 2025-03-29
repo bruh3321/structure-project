@@ -26,6 +26,58 @@ int chargerLivres(const char* filename, Livre *livres, int *total) {
     return 1;
 }
 
+int chargerEtudiant(const char* filename, Etudiant *etudiants, int *total) {
+    *total = 0;
+    FILE *fichier = fopen(filename, "r");
+    if (!fichier) {
+        perror("Erreur d'ouverture du fichier");
+        return 0;
+    }
+
+    char line[512];
+    while (*total < MAX_ETUDIANTS && fgets(line, sizeof(line), fichier)) {
+        // Initialize all emprunts to empty strings
+        for (int i = 0; i < 10; i++) {
+            etudiants[*total].emprunts[i][0] = '\0';
+        }
+
+        // Use temporary variables for safer parsing
+        char prenom[50], nom[50], cnie[20];
+        int count = sscanf(line, "%49s %49s %19s", prenom, nom, cnie);
+        
+        if (count < 3) continue;  // Skip invalid lines
+
+        // Copy the basic info
+        strncpy(etudiants[*total].prenom, prenom, sizeof(etudiants[*total].prenom) - 1);
+        strncpy(etudiants[*total].nom, nom, sizeof(etudiants[*total].nom) - 1);
+        strncpy(etudiants[*total].CNIE, cnie, sizeof(etudiants[*total].CNIE) - 1);
+
+        // Parse book loans
+        char *ptr = line;
+        // Skip the first three fields
+        for (int i = 0; i < 3; i++) {
+            ptr += strcspn(ptr, " \t");  // Skip current field
+            ptr += strspn(ptr, " \t");   // Skip whitespace
+        }
+
+        // Parse up to 10 book codes
+        for (int i = 0; i < 10 && *ptr != '\0' && *ptr != '\n'; i++) {
+            int len = strcspn(ptr, " \t\n");
+            if (len > 0) {
+                strncpy(etudiants[*total].emprunts[i], ptr, len);
+                etudiants[*total].emprunts[i][len] = '\0';
+                ptr += len;
+                ptr += strspn(ptr, " \t");  // Skip whitespace
+            }
+        }
+
+        (*total)++;
+    }
+
+    fclose(fichier);
+    return 1;
+}
+
 int sauvegarderLivre(const char* filename, Livre *l) {
     FILE *fichier = fopen(filename, "a");
     if (!fichier) {
@@ -85,16 +137,16 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
     int is_present = 0;
     
     while (etd_emprunt && fscanf(etd_emprunt, "%s %s %s %s %s %s %s %s %s %s %s %s %s", 
-           etd.prenom, etd.nom, etd.CNIE, etd.emtprunts[0], etd.emtprunts[1],
-           etd.emtprunts[2], etd.emtprunts[3], etd.emtprunts[4], etd.emtprunts[5],
-           etd.emtprunts[6], etd.emtprunts[7], etd.emtprunts[8], etd.emtprunts[9]) == 13) {
+           etd.prenom, etd.nom, etd.CNIE, etd.emprunts[0], etd.emprunts[1],
+           etd.emprunts[2], etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
+           etd.emprunts[6], etd.emprunts[7], etd.emprunts[8], etd.emprunts[9]) == 13) {
         
         if (!strcmp(etd.CNIE, etudiant->CNIE)) {
             is_present = 1;
             int added = 0;
             for (int i = 0; i < 10 && !added; i++) {
-                if (!strcmp(etd.emtprunts[i], "")) {
-                    strcpy(etd.emtprunts[i], codeLivre);
+                if (!strcmp(etd.emprunts[i], "")) {
+                    strcpy(etd.emprunts[i], codeLivre);
                     added = 1;
                 }
             }
@@ -102,9 +154,9 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
         }
         
         fprintf(tmp_emprunt, "%s %s %s %s %s %s %s %s %s %s %s %s %s\n", 
-                etd.prenom, etd.nom, etd.CNIE, etd.emtprunts[0], etd.emtprunts[1],
-                etd.emtprunts[2], etd.emtprunts[3], etd.emtprunts[4], etd.emtprunts[5],
-                etd.emtprunts[6], etd.emtprunts[7], etd.emtprunts[8], etd.emtprunts[9]);
+                etd.prenom, etd.nom, etd.CNIE, etd.emprunts[0], etd.emprunts[1],
+                etd.emprunts[2], etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
+                etd.emprunts[6], etd.emprunts[7], etd.emprunts[8], etd.emprunts[9]);
     }
     
     if (etd_emprunt) fclose(etd_emprunt);
@@ -164,24 +216,24 @@ int rendreLivre(Etudiant* etudiant, const char* codeLivre) {
     rewind(fichier);
     while (fscanf(fichier, "%s %s %s %s %s %s %s %s %s %s %s %s %s",
                     etd.prenom, etd.nom, etd.CNIE,
-                    etd.emtprunts[0], etd.emtprunts[1], etd.emtprunts[2],
-                    etd.emtprunts[3], etd.emtprunts[4], etd.emtprunts[5],
-                    etd.emtprunts[6], etd.emtprunts[7], etd.emtprunts[8],
-                    etd.emtprunts[9]) == 13) {
+                    etd.emprunts[0], etd.emprunts[1], etd.emprunts[2],
+                    etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
+                    etd.emprunts[6], etd.emprunts[7], etd.emprunts[8],
+                    etd.emprunts[9]) == 13) {
         if (strcmp(etd.CNIE, etudiant->CNIE) == 0) {
             for (int i = 0; i < 10; i++) {
-                if (strcmp(etd.emtprunts[i], codeLivre) == 0) {
-                    strcpy(etd.emtprunts[i], "");
+                if (strcmp(etd.emprunts[i], codeLivre) == 0) {
+                    strcpy(etd.emprunts[i], "");
                     break;
                 }
             }
         }
         fprintf(etd_emprunt_tmp, "%s %s %s %s %s %s %s %s %s %s %s %s %s\n",
                 etd.prenom, etd.nom, etd.CNIE,
-                etd.emtprunts[0], etd.emtprunts[1], etd.emtprunts[2],
-                etd.emtprunts[3], etd.emtprunts[4], etd.emtprunts[5],
-                etd.emtprunts[6], etd.emtprunts[7], etd.emtprunts[8],
-                etd.emtprunts[9]);
+                etd.emprunts[0], etd.emprunts[1], etd.emprunts[2],
+                etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
+                etd.emprunts[6], etd.emprunts[7], etd.emprunts[8],
+                etd.emprunts[9]);
     }
 
     fclose(fichier);

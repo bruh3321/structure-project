@@ -5,12 +5,15 @@
 #define MAX_SAISIE 100
 // hi
 Livre livres[MAX_LIVRES];
+Etudiant etudiants[MAX_ETUDIANTS];
 int total_livres = 0;
+int total_etudiants = 0;
 int start_index = 0;
 WINDOW *creerFenetre(int hauteur, int largeur, int y, int x);
 void afficherMenuPrincipal();
 void gererSaisieLivre();
 void afficherListeLivres();
+void afficherListeEtudiant();
 void emprunterLivreGUI();
 void retournerLivreGUI();
 
@@ -45,6 +48,9 @@ int main() {
             case '4':
                 // Retourner un livre
                 retournerLivreGUI();
+                break;
+            case '5':
+                afficherListeEtudiant();
                 break;
             case 'q':
                 break;
@@ -201,4 +207,46 @@ void retournerLivreGUI(){
     noecho();
     curs_set(0);
     getch();
+}
+void afficherListeEtudiant() {
+    int ch;
+    chargerEtudiant("emprunts.txt", etudiants, &total_etudiants);
+    
+    do {
+        clear();
+        mvprintw(2, 35, "LISTE DES ETUDIANT (%d/%d)", start_index + 1, total_etudiants);
+        
+        int max_lines = LINES - 6;
+        for(int i = 0; i < max_lines && (i + start_index) < total_etudiants; i++) {
+            Etudiant *l = &etudiants[i + start_index];
+            mvprintw(5 + i, 3, "%s -- %s %s | Emprunts: %s %s %s %s %s %s %s %s %s %s",
+                    l->CNIE, l->nom, l->prenom,
+                    l->emprunts[0], l->emprunts[1], l->emprunts[2],
+                    l->emprunts[3], l->emprunts[4], l->emprunts[5],
+                    l->emprunts[6], l->emprunts[7], l->emprunts[8],
+                    l->emprunts[9]
+                    );
+        }
+        
+        mvprintw(LINES - 2, 2, "↑/↓: Defilement | R: Retour");
+        refresh();
+        
+        ch = getch();
+        switch(ch) {
+            case KEY_DOWN:
+                if(start_index < total_livres - 1) start_index++;
+                break;
+            case KEY_UP:
+                if(start_index > 0) start_index--;
+                break;
+            case KEY_NPAGE: // Page down
+                start_index += max_lines;
+                if(start_index >= total_livres) start_index = total_livres - 1;
+                break;
+            case KEY_PPAGE: // Page up
+                start_index -= max_lines;
+                if(start_index < 0) start_index = 0;
+                break;
+        }
+    } while(ch != 'R' && ch != 'r');
 }
