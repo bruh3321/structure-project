@@ -12,6 +12,7 @@ void afficherMenuPrincipal();
 void gererSaisieLivre();
 void afficherListeLivres();
 void emprunterLivreGUI();
+void retournerLivreGUI();
 
 int main() {
     initscr();
@@ -40,6 +41,10 @@ int main() {
             case '3':
                 // Emprunter un livre
                 emprunterLivreGUI();
+                break;
+            case '4':
+                // Retourner un livre
+                retournerLivreGUI();
                 break;
             case 'q':
                 break;
@@ -169,6 +174,35 @@ void emprunterLivreGUI(){
         mvprintw(23, 4, "Emprunt effectue avec succes !");
     }else{
         mvprintw(23, 4, "Erreur lors de l'emprunt !");
+    }
+    noecho();
+    curs_set(0);
+    getch();
+}
+
+void retournerLivreGUI(){
+    clear();
+    char codeLivre[MAX_SAISIE];
+    Etudiant etd;
+    echo();
+    curs_set(1);
+    mvprintw(2, 30, "RETOUR DE LIVRE");
+    mvprintw(5, 10, "Code du livre : ");
+    getnstr(codeLivre, 9); // 9 : first 4 chars and other 5 nums
+
+    mvprintw(7, 10, "CNIE :");
+    getnstr(etd.CNIE, 14); // 14 is too much but just in case
+
+    mvprintw(9, 10, "Nom : ");
+    getnstr(etd.nom, 30);
+
+    mvprintw(11, 10, "Prenom : ");
+    getnstr(etd.prenom, 30);
+    
+    if(!rendreLivre(&etd, codeLivre)){ // rendrelivre returns 0 if the operation is successful
+        mvprintw(23, 4, "Retour effectue avec succes !");
+    }else{
+        mvprintw(23, 4, "Erreur lors du retour !");
     }
     noecho();
     curs_set(0);
