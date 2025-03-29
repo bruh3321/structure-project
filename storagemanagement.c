@@ -202,127 +202,69 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
         return state;
     }
 
-int rendreLivre(const char* filename, const char* codeLivre) {
-    // Logique de retour
-    FILE *livres= fopen("livres.txt", "r");
-    FILE *fichier = fopen("emprunt.txt", "r");
-    FILE *tmp = fopen("tmp.txt", "w");
-    Livre livre;
-    if (!fichier) return 1;
-    if (!tmp) return 1;
-    int state = 0;
-    while (!feof(livres)){
-        fscanf(livres, "%s %s %s %d %d %d\n", 
-               livre.code, 
-               livre.titre, 
-               livre.auteur,
-               &livre.annee, 
-               &livre.nbExemplaires, 
-               &livre.nbExemplairesDisponibles);
-        if(strcmp(livre.code, codeLivre) == 0){ 
-                if(livre.nbExemplairesDisponibles < livre.nbExemplaires){
-                    fprintf(tmp, "%s %s %s %d %d %d\n", 
-                        livre.code, 
-                        livre.titre, 
-                        livre.auteur,
-                        livre.annee, 
-                        livre.nbExemplaires, 
-                        ++livre.nbExemplairesDisponibles
-                        );
-                }else{
-                    fprintf(tmp, "%s %s %s %d %d %d\n", 
-                            livre.code, 
-                            livre.titre, 
-                            livre.auteur,
-                            livre.annee, 
-                            livre.nbExemplaires, 
-                            livre.nbExemplairesDisponibles
-                        );
-                        state = 1;
-                    }
-        }else{
-            fprintf(tmp, "%s %s %s %d %d %d\n", 
-               livre.code, 
-               livre.titre, 
-               livre.auteur,
-               livre.annee, 
-               livre.nbExemplaires, 
-               livre.nbExemplairesDisponibles);
+    int rendreLivre(Etudiant* etudiant, const char* codeLivre) {
+        FILE *livres = fopen("livres.txt", "r");
+        FILE *fichier = fopen("emprunts.txt", "r");
+        FILE *tmp = fopen("tmp.txt", "w");
+        if (!livres || !fichier || !tmp) {
+            if (livres) fclose(livres);
+            if (fichier) fclose(fichier);
+            if (tmp) fclose(tmp);
+            return 1;
         }
-    }
-    fclose(livres);
-    fclose(tmp);
-    remove("livres.txt");
-    rename("tmp.txt", "livres.txt");
-    // etudiant retour section
-    FILE *etd_emprunt = fopen("emprunts.txt", "r");
-    FILE *etd_emprunt_tmp = fopen("tmp_emprunt.txt", "w");
-    if (!etd_emprunt || !etd_emprunt_tmp) {
-        if (etd_emprunt) fclose(etd_emprunt);
-        if (etd_emprunt_tmp) fclose(etd_emprunt_tmp);
-        return 1;
-    }
-    Etudiant etd = {0};  // thank you i didnt know this could be inititalized all at once
-    while(fscanf(etd_emprunt, "%s %s %s %s %s %s %s %s %s %s %s %s %s", 
-        etd.prenom, 
-        etd.nom, 
-        etd.CNIE,
-        etd.emtprunts[0], 
-        etd.emtprunts[1], 
-        etd.emtprunts[2],
-        etd.emtprunts[3], 
-        etd.emtprunts[4], 
-        etd.emtprunts[5],
-        etd.emtprunts[6],
-        etd.emtprunts[7], 
-        etd.emtprunts[8], 
-        etd.emtprunts[9]) == 13) {
-        if(strcmp(etd.emtprunts[0], codeLivre) == 0){
-            for(int i = 0; i < 10; i++){
-                if(strcmp(etd.emtprunts[i], codeLivre) == 0){
-                    strcpy(etd.emtprunts[i], "");
-                    break;
+    
+        Livre livre;
+        int state = 0;
+        while (fscanf(livres, "%s %s %s %d %d %d", 
+               livre.code, livre.titre, livre.auteur,
+               &livre.annee, &livre.nbExemplaires, 
+               &livre.nbExemplairesDisponibles) == 6) {
+            if (strcmp(livre.code, codeLivre) == 0) {
+                if (livre.nbExemplairesDisponibles < livre.nbExemplaires) {
+                    livre.nbExemplairesDisponibles++;
+                } else {
+                    state = 1;
                 }
             }
+            fprintf(tmp, "%s %s %s %d %d %d\n", 
+                    livre.code, livre.titre, livre.auteur,
+                    livre.annee, livre.nbExemplaires, 
+                    livre.nbExemplairesDisponibles);
         }
-        int empty=1;
-        for (int i=0; i<10; i++) {
-            if (strcmp(etd.emtprunts[i], "") != 0) {
-                empty = 0;
-            }
-        }
-        if (empty==0){
-            continue;
-        }else {
-            fprintf(etd_emprunt_tmp, "%s %s %s %s %s %s %s %s %s %s %s %s %s\n", 
-                etd.prenom, 
-                etd.nom, 
-                etd.CNIE,
-                etd.emtprunts[0], 
-                etd.emtprunts[1], 
-                etd.emtprunts[2],
-                etd.emtprunts[3], 
-                etd.emtprunts[4], 
-                etd.emtprunts[5],
-                etd.emtprunts[6],
-                etd.emtprunts[7], 
-                etd.emtprunts[8], 
-                etd.emtprunts[9]);
-        }
-
-    }
+        fclose(livres);
+        fclose(tmp);
+        remove("livres.txt");
+        rename("tmp.txt", "livres.txt");
     
-    fclose(etd_emprunt);
-    fclose(etd_emprunt_tmp);
+        FILE *etd_emprunt_tmp = fopen("tmp_emprunt.txt", "w");
+        Etudiant etd;
+        rewind(fichier);
+        while (fscanf(fichier, "%s %s %s %s %s %s %s %s %s %s %s %s %s",
+                      etd.prenom, etd.nom, etd.CNIE,
+                      etd.emtprunts[0], etd.emtprunts[1], etd.emtprunts[2],
+                      etd.emtprunts[3], etd.emtprunts[4], etd.emtprunts[5],
+                      etd.emtprunts[6], etd.emtprunts[7], etd.emtprunts[8],
+                      etd.emtprunts[9]) == 13) {
+            if (strcmp(etd.CNIE, etudiant->CNIE) == 0) {
+                for (int i = 0; i < 10; i++) {
+                    if (strcmp(etd.emtprunts[i], codeLivre) == 0) {
+                        strcpy(etd.emtprunts[i], "");
+                        break;
+                    }
+                }
+            }
+            fprintf(etd_emprunt_tmp, "%s %s %s %s %s %s %s %s %s %s %s %s %s\n",
+                    etd.prenom, etd.nom, etd.CNIE,
+                    etd.emtprunts[0], etd.emtprunts[1], etd.emtprunts[2],
+                    etd.emtprunts[3], etd.emtprunts[4], etd.emtprunts[5],
+                    etd.emtprunts[6], etd.emtprunts[7], etd.emtprunts[8],
+                    etd.emtprunts[9]);
+        }
 
-    if(remove("emprunts.txt") != 0) {
-        perror("Error removing file");
-        return 1;
+        fclose(fichier);
+        fclose(etd_emprunt_tmp);
+        remove("emprunts.txt");
+        rename("tmp_emprunt.txt", "emprunts.txt");
+    
+        return state;
     }
-
-    if(rename("tmp_emprunt.txt", "emprunts.txt") != 0) {
-        perror("Error renaming file");
-        return 1;
-    }
-    return state;
-}

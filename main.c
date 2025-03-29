@@ -183,7 +183,7 @@ void emprunterLivreGUI(){
 void retournerLivreGUI(){
     clear();
     char codeLivre[MAX_SAISIE];
-    Etudiant etd;
+    Etudiant etd={0};
     echo();
     curs_set(1);
     mvprintw(2, 30, "RETOUR DE LIVRE");
@@ -192,12 +192,6 @@ void retournerLivreGUI(){
 
     mvprintw(7, 10, "CNIE :");
     getnstr(etd.CNIE, 14); // 14 is too much but just in case
-
-    mvprintw(9, 10, "Nom : ");
-    getnstr(etd.nom, 30);
-
-    mvprintw(11, 10, "Prenom : ");
-    getnstr(etd.prenom, 30);
     
     if(!rendreLivre(&etd, codeLivre)){ // rendrelivre returns 0 if the operation is successful
         mvprintw(23, 4, "Retour effectue avec succes !");
