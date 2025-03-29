@@ -3,6 +3,7 @@
         "system_error": "c",
         "ncurses.h": "c",
         "curses.h": "c",
-        "storagemanagement.h": "c"
+        "storagemanagement.h": "c",
+        "structs.h": "c"
     }
 }
