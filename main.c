@@ -219,7 +219,7 @@ void afficherListeEtudiant() {
         int max_lines = LINES - 6;
         for(int i = 0; i < max_lines && (i + start_index) < total_etudiants; i++) {
             Etudiant *l = &etudiants[i + start_index];
-            mvprintw(5 + i, 3, "%s -- %s %s | Emprunts: %s %s %s %s %s %s %s %s %s %s",
+            mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s %s %s %s %s %s %s %s %s %s",
                     l->CNIE, l->nom, l->prenom,
                     l->emprunts[0], l->emprunts[1], l->emprunts[2],
                     l->emprunts[3], l->emprunts[4], l->emprunts[5],
