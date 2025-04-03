@@ -152,7 +152,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
             }
             if (!added) printf("Erreur: Maximum de livres empruntés\n");
         }
-        
+
         fprintf(tmp_emprunt, "%s %s %s %s %s %s %s %s %s %s %s %s %s\n", 
                 etd.prenom, etd.nom, etd.CNIE, etd.emprunts[0], etd.emprunts[1],
                 etd.emprunts[2], etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
