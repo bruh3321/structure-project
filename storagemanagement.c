@@ -100,7 +100,7 @@ int rechercherLivre(const char* filename, const char* critere, const int type) {
 }
 
 int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
-    // Book borrowing section
+    // Book borrowing section - Fixed book existence check
     FILE *fichier = fopen("livres.txt", "r");
     if (!fichier) return 1;
     
@@ -108,30 +108,40 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
     if (!tmp) { fclose(fichier); return 1; }
     
     Livre livre;
+    int book_exists = 0;
     int state = 0;
     while (fscanf(fichier, "%s %s %s %d %d %d", 
            livre.code, livre.titre, livre.auteur,
            &livre.annee, &livre.nbExemplaires, &livre.nbExemplairesDisponibles) == 6) {
         
-        if (!strcmp(livre.code, codeLivre) && livre.nbExemplairesDisponibles > 0) {
-            livre.nbExemplairesDisponibles--;
-        } else if (!strcmp(livre.code, codeLivre)) {
-            state = 1;
+        if (!strcmp(livre.code, codeLivre)) {
+            book_exists = 1;
+            if (livre.nbExemplairesDisponibles > 0) {
+                livre.nbExemplairesDisponibles--;
+            } else {
+                state = 1;  // Book exists but no copies available
+            }
         }
         
         fprintf(tmp, "%s %s %s %d %d %d\n", 
                livre.code, livre.titre, livre.auteur,
                livre.annee, livre.nbExemplaires, livre.nbExemplairesDisponibles);
     }
+    
     fclose(fichier);
     fclose(tmp);
     remove("livres.txt");
     rename("tmp.txt", "livres.txt");
 
-    // Student borrowing section
+    if (!book_exists) return 1;  // Book doesn't exist at all
+
+    // Student borrowing section - Fixed data persistence
     FILE *etd_emprunt = fopen("emprunts.txt", "r");
     FILE *tmp_emprunt = fopen("tmp_emprunt.txt", "w");
-    if (!tmp_emprunt) { if (etd_emprunt) fclose(etd_emprunt); return 1; }
+    if (!tmp_emprunt) { 
+        if (etd_emprunt) fclose(etd_emprunt); 
+        return 1; 
+    }
 
     Etudiant etd = {0};
     int is_present = 0;
@@ -145,18 +155,24 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
             is_present = 1;
             int added = 0;
             for (int i = 0; i < 10 && !added; i++) {
-                if (!strcmp(etd.emprunts[i], "")) {
+                if (strcmp(etd.emprunts[i], "NULL") == 0) {
                     strcpy(etd.emprunts[i], codeLivre);
                     added = 1;
                 }
             }
-            if (!added) printf("Erreur: Maximum de livres empruntés\n");
+            if (!added) {
+                printf("Erreur: Maximum de livres empruntés\n");
+                state = 1;
+            }
         }
 
+        // Write all fields with NULL placeholder
         fprintf(tmp_emprunt, "%s %s %s %s %s %s %s %s %s %s %s %s %s\n", 
-                etd.prenom, etd.nom, etd.CNIE, etd.emprunts[0], etd.emprunts[1],
-                etd.emprunts[2], etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
-                etd.emprunts[6], etd.emprunts[7], etd.emprunts[8], etd.emprunts[9]);
+                etd.prenom, etd.nom, etd.CNIE,
+                etd.emprunts[0], etd.emprunts[1], etd.emprunts[2],
+                etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
+                etd.emprunts[6], etd.emprunts[7], etd.emprunts[8],
+                etd.emprunts[9]);
     }
     
     if (etd_emprunt) fclose(etd_emprunt);
@@ -168,8 +184,9 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
     if (!is_present) {
         FILE *f = fopen("emprunts.txt", "a");
         if (f) {
-            fprintf(f, "%s %s %s %s %*s\n", etudiant->prenom, etudiant->nom, 
-                    etudiant->CNIE, codeLivre, 9*3, ""); // 9 empty strings (3 chars each)
+            fprintf(f, "%s %s %s %s NULL NULL NULL NULL NULL NULL NULL NULL NULL\n", 
+                    etudiant->prenom, etudiant->nom, 
+                    etudiant->CNIE, codeLivre);
             fclose(f);
         }
     }
