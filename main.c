@@ -3,7 +3,7 @@
 #include "structs.h"
 
 #define MAX_SAISIE 100
-// hi
+
 Livre livres[MAX_LIVRES];
 Etudiant etudiants[MAX_ETUDIANTS];
 int total_livres = 0;
