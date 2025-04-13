@@ -238,7 +238,7 @@ void afficherListeEtudiant() {
                 mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s",
                         l->CNIE, l->nom, l->prenom, first_book);
             } else {
-                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s (+%d autres)",
+                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s (+%d restant(s) ouvert(s))",
                         l->CNIE, l->nom, l->prenom, first_book, books_count-1);
             }
         }
