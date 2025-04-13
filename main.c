@@ -1,6 +1,7 @@
 #include <ncurses.h>
 #include "storagemanagement.h"
 #include "structs.h"
+#include "string.h"
 
 #define MAX_SAISIE 100
 
@@ -224,7 +225,7 @@ void afficherListeEtudiant() {
             char *first_book = NULL;
             int books_count = 0;
             for (int j = 0; j < 10; j++) {
-                if (l->emprunts[j] != NULL) {
+                if (strcmp(l->emprunts[j],"NULL") != 0) {
                     books_count++;
                     if (first_book == NULL) first_book = l->emprunts[j];
                 }
@@ -239,7 +240,7 @@ void afficherListeEtudiant() {
                         l->CNIE, l->nom, l->prenom, first_book);
             } else {
                 mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s (+%d restant(s) ouvert(s))",
-                        l->CNIE, l->nom, l->prenom, first_book, books_count-1);
+                        l->CNIE, l->nom, l->prenom, first_book, 10-books_count);
             }
         }
         
