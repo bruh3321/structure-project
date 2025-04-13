@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <string.h>
 #include "storagemanagement.h"
 #include "structs.h"
 
@@ -220,28 +221,34 @@ void afficherListeEtudiant() {
         for(int i = 0; i < max_lines && (i + start_index) < total_etudiants; i++) {
             Etudiant *l = &etudiants[i + start_index];
             
-            // Count and get first non-NULL book
-            char *first_book = NULL;
+            // Count non-NULL books
             int books_count = 0;
             for (int j = 0; j < 10; j++) {
-                if (l->emprunts[j] != NULL) {
-                    books_count++;
-                    if (first_book == NULL) first_book = l->emprunts[j];
-                }
+                if (l->emprunts[j] != NULL) books_count++;
             }
             
-            // Print summary
+            // Print based on count
             if (books_count == 0) {
                 mvprintw(5 + i, 3, "%s - %s %s | Emprunts: Aucun",
                         l->CNIE, l->nom, l->prenom);
-            } else if (books_count == 1) {
-                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s",
-                        l->CNIE, l->nom, l->prenom, first_book);
             } else {
-                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s (+%d restant(s) ouvert(s))",
-                        l->CNIE, l->nom, l->prenom, first_book, books_count-1);
+                // First line with basic info
+                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: ",
+                        l->CNIE, l->nom, l->prenom);
+                
+                // Print books on the same line if they fit
+                int col = 3 + strlen(l->CNIE) + strlen(l->nom) + strlen(l->prenom) + 15;
+                for (int j = 0; j < 10; j++) {
+                    if (strcmp(l->emprunts[j],"NULL")!=0) {
+                        mvprintw(5 + i, col, "  %s%s",
+                                j > 0 ? ", " : "", 
+                                l->emprunts[j]);
+                        col += strlen(l->emprunts[j]) + 2;
+                    }
+                }
             }
         }
+
         
         mvprintw(LINES - 2, 2, "↑/↓: Defilement | R: Retour");
         refresh();
