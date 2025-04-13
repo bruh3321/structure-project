@@ -2,6 +2,7 @@
 #include <string.h>
 #include "storagemanagement.h"
 #include "structs.h"
+#include "string.h"
 
 #define MAX_SAISIE 100
 
@@ -232,23 +233,10 @@ void afficherListeEtudiant() {
                 mvprintw(5 + i, 3, "%s - %s %s | Emprunts: Aucun",
                         l->CNIE, l->nom, l->prenom);
             } else {
-                // First line with basic info
-                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: ",
-                        l->CNIE, l->nom, l->prenom);
-                
-                // Print books on the same line if they fit
-                int col = 3 + strlen(l->CNIE) + strlen(l->nom) + strlen(l->prenom) + 15;
-                for (int j = 0; j < 10; j++) {
-                    if (strcmp(l->emprunts[j],"NULL")!=0) {
-                        mvprintw(5 + i, col, "  %s%s",
-                                j > 0 ? ", " : "", 
-                                l->emprunts[j]);
-                        col += strlen(l->emprunts[j]) + 2;
-                    }
-                }
+                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s (+%d restant(s) ouvert(s))",
+                        l->CNIE, l->nom, l->prenom, first_book, books_count-1);
             }
         }
-
         
         mvprintw(LINES - 2, 2, "↑/↓: Defilement | R: Retour");
         refresh();
