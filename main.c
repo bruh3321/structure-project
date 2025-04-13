@@ -42,11 +42,9 @@ int main() {
                 afficherListeLivres();
                 break;
             case '3':
-                // Emprunter un livre
                 emprunterLivreGUI();
                 break;
             case '4':
-                // Retourner un livre
                 retournerLivreGUI();
                 break;
             case '5':
@@ -219,13 +217,28 @@ void afficherListeEtudiant() {
         int max_lines = LINES - 6;
         for(int i = 0; i < max_lines && (i + start_index) < total_etudiants; i++) {
             Etudiant *l = &etudiants[i + start_index];
-            mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s %s %s %s %s %s %s %s %s %s",
-                    l->CNIE, l->nom, l->prenom,
-                    l->emprunts[0], l->emprunts[1], l->emprunts[2],
-                    l->emprunts[3], l->emprunts[4], l->emprunts[5],
-                    l->emprunts[6], l->emprunts[7], l->emprunts[8],
-                    l->emprunts[9]
-                    );
+            
+            // Count and get first non-NULL book
+            char *first_book = NULL;
+            int books_count = 0;
+            for (int j = 0; j < 10; j++) {
+                if (l->emprunts[j] != NULL) {
+                    books_count++;
+                    if (first_book == NULL) first_book = l->emprunts[j];
+                }
+            }
+            
+            // Print summary
+            if (books_count == 0) {
+                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: Aucun",
+                        l->CNIE, l->nom, l->prenom);
+            } else if (books_count == 1) {
+                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s",
+                        l->CNIE, l->nom, l->prenom, first_book);
+            } else {
+                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s (+%d emplacement(s) restant(s))",
+                        l->CNIE, l->nom, l->prenom, first_book, books_count-1);
+            }
         }
         
         mvprintw(LINES - 2, 2, "↑/↓: Defilement | R: Retour");
