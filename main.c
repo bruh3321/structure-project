@@ -44,11 +44,9 @@ int main() {
                 afficherListeLivres();
                 break;
             case '3':
-                // Emprunter un livre
                 emprunterLivreGUI();
                 break;
             case '4':
-                // Retourner un livre
                 retournerLivreGUI();
                 break;
             case '5':
@@ -88,24 +86,30 @@ void gererSaisieLivre() {
     clear();
     Livre nouveau;
     
+    keypad(stdscr, true);
     echo();
     curs_set(1);
     
-    mvprintw(2, 30, "NOUVEAU LIVRE");
+    mvprintw(2, 30, "NOUVEAU LIVRE (entrer pour sortir)");
     mvprintw(5, 10, "Code : ");
     getnstr(nouveau.code, 9);
-    
+    if (nouveau.code[0]==0) return;
+
     mvprintw(6, 10, "Titre : ");
     getnstr(nouveau.titre, 49);
+    if (nouveau.titre[0]==0) return;
     
     mvprintw(7, 10, "Auteur : ");
     getnstr(nouveau.auteur, 49);
+    if (nouveau.auteur[0]==0) return;
     
     mvprintw(8, 10, "Annee : ");
     scanw("%d", &nouveau.annee);
+    if (nouveau.annee==0) return;
     
     mvprintw(9, 10, "Exemplaires : ");
     scanw("%d", &nouveau.nbExemplaires);
+    if (nouveau.nbExemplaires==0) return;
     
     nouveau.nbExemplairesDisponibles = nouveau.nbExemplaires;
     
@@ -165,19 +169,23 @@ void emprunterLivreGUI(){
     Etudiant etd;
     echo();
     curs_set(1);
-    mvprintw(2, 30, "EMPRUNT DE LIVRE");
+    mvprintw(2, 30, "EMPRUNT DE LIVRE ou entrer pour quitter ce menu");
     mvprintw(5, 10, "Code du livre : ");
     getnstr(codeLivre, 9); // 9 : the first 4 chars and the othor 5 numbers
+    if (codeLivre[0]==0) return;
 
     mvprintw(7, 10, "CNIE :");
     getnstr(etd.CNIE, 14); // 14 is too much but just in case
+    if (etd.CNIE[0]==0) return;
 
     mvprintw(9, 10, "Nom : ");
     getnstr(etd.nom, 30);
+    if (etd.nom[0]==0) return;
 
     mvprintw(11, 10, "Prenom : ");
     getnstr(etd.prenom, 30);
-    
+    if (etd.prenom[0]==0) return;
+
     if(!emprunterLivre(&etd, codeLivre)){ // emprunterLivre returns 0 if the operation is successful
         mvprintw(23, 4, "Emprunt effectue avec succes !");
     }else{
@@ -234,7 +242,7 @@ void afficherListeEtudiant() {
                         l->CNIE, l->nom, l->prenom);
             } else {
                 mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s (+%d restant(s) ouvert(s))",
-                        l->CNIE, l->nom, l->prenom, first_book, books_count-1);
+                        l->CNIE, l->nom, l->prenom, l->emprunts[0], books_count-1);
             }
         }
         

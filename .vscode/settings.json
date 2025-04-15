@@ -4,6 +4,7 @@
         "ncurses.h": "c",
         "curses.h": "c",
         "storagemanagement.h": "c",
-        "structs.h": "c"
+        "structs.h": "c",
+        "stdalign.h": "c"
     }
 }
