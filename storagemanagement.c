@@ -237,20 +237,26 @@ int rendreLivre(Etudiant* etudiant, const char* codeLivre) {
                     etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
                     etd.emprunts[6], etd.emprunts[7], etd.emprunts[8],
                     etd.emprunts[9]) == 13) {
+        int num_emprunt = 0;
         if (strcmp(etd.CNIE, etudiant->CNIE) == 0) {
             for (int i = 0; i < 10; i++) {
                 if (strcmp(etd.emprunts[i], codeLivre) == 0) {
-                    strcpy(etd.emprunts[i], "");
+                    strcpy(etd.emprunts[i], "NULL");
+                    num_emprunt += 1;
                     break;
+                }else if(strcmp(etd.emprunts[i],"NULL")){
+                    num_emprunt += 1;
                 }
             }
         }
-        fprintf(etd_emprunt_tmp, "%s %s %s %s %s %s %s %s %s %s %s %s %s\n",
+        if(num_emprunt <=10){
+            fprintf(etd_emprunt_tmp, "%s %s %s %s %s %s %s %s %s %s %s %s %s\n",
                 etd.prenom, etd.nom, etd.CNIE,
                 etd.emprunts[0], etd.emprunts[1], etd.emprunts[2],
                 etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
                 etd.emprunts[6], etd.emprunts[7], etd.emprunts[8],
                 etd.emprunts[9]);
+            }
     }
 
     fclose(fichier);
