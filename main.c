@@ -11,7 +11,7 @@ Etudiant etudiants[MAX_ETUDIANTS];
 int total_livres = 0;
 int total_etudiants = 0;
 int start_index = 0;
-WINDOW *creerFenetre(int hauteur, int largeur, int y, int x);
+
 void afficherMenuPrincipal();
 void gererSaisieLivre();
 void afficherListeLivres();
