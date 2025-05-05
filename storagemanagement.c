@@ -94,7 +94,7 @@ int sauvegarderLivre(const char* filename, Livre *l) {
 }
 
 
-int rechercherLivre(const char* filename, const char* critere, const int type) {
+int rechercherLivre(const char* filename, int* critere, const int type) {
     // TO-DO : Implémentez la recherche
     return 1;
 }
@@ -109,7 +109,6 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
     
     Livre livre;
     int book_exists = 0;
-    int state = 0;
     while (fscanf(fichier, "%s %s %s %d %d %d", 
            livre.code, livre.titre, livre.auteur,
            &livre.annee, &livre.nbExemplaires, &livre.nbExemplairesDisponibles) == 6) {
@@ -119,7 +118,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
             if (livre.nbExemplairesDisponibles > 0) {
                 livre.nbExemplairesDisponibles--;
             } else {
-                state = 1;  // Book exists but no copies available
+                return 2;  // Book exists but no copies available
             }
         }
         
@@ -140,7 +139,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
     FILE *tmp_emprunt = fopen("tmp_emprunt.txt", "w");
     if (!tmp_emprunt) { 
         if (etd_emprunt) fclose(etd_emprunt); 
-        return 1; 
+        return -1; 
     }
 
     Etudiant etd = {0};
@@ -162,7 +161,6 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
             }
             if (!added) {
                 printf("Erreur: Maximum de livres empruntés\n");
-                state = 1;
             }
         }
 
@@ -191,7 +189,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
         }
     }
     
-    return state;
+    return 1; //success
 }
 
 int rendreLivre(Etudiant* etudiant, const char* codeLivre) {

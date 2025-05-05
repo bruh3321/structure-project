@@ -186,8 +186,14 @@ void emprunterLivreGUI(){
     getnstr(etd.prenom, 30);
     if (etd.prenom[0]==0) return;
 
-    if(!emprunterLivre(&etd, codeLivre)){ // emprunterLivre returns 0 if the operation is successful
+    int etat_emprunt = emprunterLivre(&etd, codeLivre);
+
+    if(etat_emprunt == 0){ // emprunterLivre returns 0 if the operation is successful
         mvprintw(23, 4, "Emprunt effectue avec succes !");
+    }else if(etat_emprunt == 1){
+        mvprintw(23, 4, "ther is no book with this code");
+    }else if(etat_emprunt == 2){
+        mvprintw(23, 4, "no copies available");
     }else{
         mvprintw(23, 4, "Erreur lors de l'emprunt !");
     }
