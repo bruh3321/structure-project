@@ -3,7 +3,7 @@
 #include "storagemanagement.h"
 #include "structs.h"
 #include "string.h"
-
+#include "stdlib.h"
 #define MAX_SAISIE 100
 
 Livre livres[MAX_LIVRES];
@@ -18,6 +18,7 @@ void afficherListeLivres();
 void afficherListeEtudiant();
 void emprunterLivreGUI();
 void retournerLivreGUI();
+void rechercherLivreGUI();
 
 int main() {
     initscr();
@@ -52,6 +53,9 @@ int main() {
             case '5':
                 afficherListeEtudiant();
                 break;
+            case '6':
+                rechercherLivreGUI();
+                break;
             case 'q':
                 break;
             default:
@@ -75,7 +79,8 @@ void afficherMenuPrincipal() {
     mvprintw(7, 30, "3. Emprunter un livre");
     mvprintw(8, 30, "4. Retourner un livre");
     mvprintw(9, 30, "5. Liste des etudiants");
-    mvprintw(10, 30, "q. Quitter");
+    mvprintw(10, 30, "6. rechercher un livre");
+    mvprintw(11, 30, "q. Quitter");
     
     attron(COLOR_PAIR(2));
     mvprintw(23, 2, "Votre choix : ");
@@ -273,4 +278,102 @@ void afficherListeEtudiant() {
                 break;
         }
     } while(ch != 'R' && ch != 'r');
+}
+
+void rechercherLivreGUI() {
+    Livre *livres = NULL;
+    int ch, nbTrouves = 0;
+    int start_index = 0;
+    char critere[MAX_SAISIE];
+
+    clear();
+    echo();
+    curs_set(1);
+
+    mvprintw(2, 30, "RECHERCHER UN LIVRE");
+    mvprintw(4, 10, "1. Titre");
+    mvprintw(5, 10, "2. Auteur");
+    mvprintw(6, 10, "3. Annee");
+    mvprintw(7, 10, "0. Code");
+    mvprintw(8, 10, "4. Retour au menu principal");
+    mvprintw(10, 10, "Choix : ");
+    refresh();
+
+    int choix = getch() - '0';
+    if (choix < 0 || choix > 4) return;
+
+    if (choix == 4) return;  // Retour au menu principal
+
+    clear();
+    mvprintw(2, 30, "RECHERCHER UN LIVRE (Entrer pour quitter)");
+
+    switch (choix) {
+        case 1:
+            mvprintw(4, 30, "Titre : ");
+            getnstr(critere, 50);
+            livres = rechercherLivres("livres.txt", critere, 1, &nbTrouves);
+            break;
+        case 2:
+            mvprintw(4, 30, "Auteur : ");
+            getnstr(critere, 50);
+            livres = rechercherLivres("livres.txt", critere, 2, &nbTrouves);
+            break;
+        case 3:
+            mvprintw(4, 30, "Annee : ");
+            getnstr(critere, 4);
+            livres = rechercherLivres("livres.txt", critere, 3, &nbTrouves);
+            break;
+        case 0:
+            mvprintw(4, 30, "Code : ");
+            getnstr(critere, 10);
+            livres = rechercherLivres("livres.txt", critere, 0, &nbTrouves);
+            break;
+        default:
+            break;
+    }
+
+    if (livres == NULL || nbTrouves <= 0) {
+        mvprintw(6, 30, "Aucun livre trouvé !");
+        getch();
+    } else { 
+        do {
+            clear();
+            mvprintw(2, 30, "LISTE DES LIVRES (%d/%d)", start_index + 1, nbTrouves);
+
+            int max_lines = LINES - 6;
+            for (int i = 0; i < max_lines && (i + start_index) < nbTrouves; i++) {
+                Livre *l = &livres[i + start_index]; 
+                mvprintw(5 + i, 3, "%s - %s (%s) | Annee: %d | Disp: %d/%d",
+                         l->code, l->titre, l->auteur, l->annee,
+                         l->nbExemplairesDisponibles, l->nbExemplaires);
+            }
+
+            mvprintw(LINES - 2, 2, "↑/↓: Defilement | PgUp/PgDn: Page | R: Retour");
+            refresh();
+
+            ch = getch();
+            switch (ch) {
+                case KEY_DOWN:
+                    if (start_index < nbTrouves - 1) start_index++;
+                    break;
+                case KEY_UP:
+                    if (start_index > 0) start_index--;
+                    break;
+                case KEY_NPAGE:
+                    start_index += max_lines;
+                    if (start_index >= nbTrouves) start_index = nbTrouves - 1;
+                    break;
+                case KEY_PPAGE:
+                    start_index -= max_lines;
+                    if (start_index < 0) start_index = 0;
+                    break;
+            }
+
+        } while (ch != 'R' && ch != 'r');
+    }
+
+    if (livres) free(livres);  // Libération mémoire
+    noecho();
+    curs_set(0);
+    getch();
 }

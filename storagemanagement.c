@@ -94,9 +94,50 @@ int sauvegarderLivre(const char* filename, Livre *l) {
 }
 
 
-int rechercherLivre(const char* filename, int* critere, const int type) {
-    // TO-DO : Implémentez la recherche
-    return 1;
+Livre* rechercherLivres(const char* filename, const char* critere, int type, int* nbTrouves) {
+    FILE *fichier = fopen(filename, "r");
+    if (!fichier) {
+        *nbTrouves = -1;  // Erreur ouverture fichier
+        return NULL;
+    }
+
+    Livre *resultats = (Livre*)malloc(sizeof(Livre) * MAX_LIVRES);
+    if (!resultats) {
+        fclose(fichier);
+        *nbTrouves = -2;  // Erreur allocation
+        return NULL;
+    }
+
+    Livre temp;
+    int count = 0;
+
+    while (fscanf(fichier, "%s %s %s %d %d %d",
+                  temp.code, temp.titre, temp.auteur,
+                  &temp.annee, &temp.nbExemplaires, &temp.nbExemplairesDisponibles) == 6) {
+
+        int match = 0;
+        switch (type) {
+            case 0: match = (strcmp(temp.code, critere) == 0); break;
+            case 1: match = (strcmp(temp.titre, critere) == 0); break;
+            case 2: match = (strcmp(temp.auteur, critere) == 0); break;
+            case 3: match = (temp.annee == atoi(critere)); break;
+            default: match = 0;
+        }
+
+        if (match) {
+            resultats[count++] = temp;
+            if (count >= MAX_LIVRES) break;
+        }
+    }
+    fclose(fichier);
+    *nbTrouves = count;
+
+    // Si aucun livre trouvé, libérer la mémoire et retourner NULL
+    if (count == 0) {
+        free(resultats);
+        return NULL;
+    }
+    return resultats;
 }
 
 int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
