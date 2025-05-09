@@ -375,5 +375,4 @@ void rechercherLivreGUI() {
     if (livres) free(livres);  // Libération mémoire
     noecho();
     curs_set(0);
-    getch();
 }
