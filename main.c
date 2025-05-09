@@ -6,12 +6,14 @@
 #include "stdlib.h"
 #define MAX_SAISIE 100
 
+// Déclaration des tableaux globaux pour les livres et étudiants
 Livre livres[MAX_LIVRES];
 Etudiant etudiants[MAX_ETUDIANTS];
-int total_livres = 0;
-int total_etudiants = 0;
-int start_index = 0;
+int total_livres = 0;        // Nombre total de livres dans le système
+int total_etudiants = 0;     // Nombre total d'étudiants dans le système
+int start_index = 0;         // Index de départ pour le défilement des listes
 
+// Prototypes des fonctions
 void afficherMenuPrincipal();
 void gererSaisieLivre();
 void afficherListeLivres();
@@ -20,60 +22,71 @@ void emprunterLivreGUI();
 void retournerLivreGUI();
 void rechercherLivreGUI();
 
+/**
+ * Fonction principale du programme
+ * Initialise l'interface ncurses et gère le menu principal
+ * @return 0 si le programme se termine normalement
+ */
 int main() {
-    initscr();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-    scrollok(stdscr, TRUE);
-    curs_set(0);
-    start_color();
+    // Initialisation de ncurses
+    initscr();              // Initialise l'écran
+    cbreak();               // Désactive la mise en mémoire tampon de ligne
+    noecho();               // Désactive l'affichage des caractères saisis
+    keypad(stdscr, TRUE);   // Active les touches spéciales du clavier
+    scrollok(stdscr, TRUE); // Autorise le défilement de l'écran
+    curs_set(0);            // Cache le curseur
+    start_color();          // Active les couleurs
 
-    init_pair(1, COLOR_WHITE, COLOR_BLUE);
-    init_pair(2, COLOR_BLACK, COLOR_WHITE);
+    // Définition des paires de couleurs
+    init_pair(1, COLOR_WHITE, COLOR_BLUE);  // Texte blanc sur fond bleu
+    init_pair(2, COLOR_BLACK, COLOR_WHITE); // Texte noir sur fond blanc
 
     int choix;
     do {
         afficherMenuPrincipal();
-        choix = getch();
+        choix = getch();    // Récupère le choix de l'utilisateur
         
         switch(choix) {
             case '1':
-                gererSaisieLivre();
+                gererSaisieLivre();         // Ajouter un livre
                 break;
             case '2':
-                afficherListeLivres();
+                afficherListeLivres();      // Afficher la liste des livres
                 break;
             case '3':
-                emprunterLivreGUI();
+                emprunterLivreGUI();       // Emprunter un livre
                 break;
             case '4':
-                retournerLivreGUI();
+                retournerLivreGUI();       // Retourner un livre
                 break;
             case '5':
-                afficherListeEtudiant();
+                afficherListeEtudiant();   // Afficher la liste des étudiants
                 break;
             case '6':
-                rechercherLivreGUI();
+                rechercherLivreGUI();      // Rechercher un livre
                 break;
             case 'q':
-                break;
+                break;                    // Quitter l'application
             default:
                 mvprintw(23, 2, "Choix invalide !");
                 refresh();
         }
     } while(choix != 'q');
 
-    endwin();
+    endwin();  // Restaure les paramètres du terminal
     return 0;
 }
 
+/**
+ * Affiche le menu principal de l'application
+ */
 void afficherMenuPrincipal() {
     clear();
     attron(COLOR_PAIR(1));
     mvprintw(2, 35, "GESTION BIBLIOTHEQUE");
     attroff(COLOR_PAIR(1));
 
+    // Affichage des options du menu
     mvprintw(5, 30, "1. Ajouter un livre");
     mvprintw(6, 30, "2. Liste des livres");
     mvprintw(7, 30, "3. Emprunter un livre");
@@ -87,18 +100,23 @@ void afficherMenuPrincipal() {
     refresh();
 }
 
+/**
+ * Gère la saisie d'un nouveau livre
+ */
 void gererSaisieLivre() {
     clear();
     Livre nouveau;
     
+    // Configuration de l'entrée
     keypad(stdscr, true);
     echo();
     curs_set(1);
     
+    // Saisie des informations du livre
     mvprintw(2, 30, "NOUVEAU LIVRE (entrer pour sortir)");
     mvprintw(5, 10, "Code : ");
     getnstr(nouveau.code, 9);
-    if (nouveau.code[0]==0) return;
+    if (nouveau.code[0]==0) return;  // Sortie si champ vide
 
     mvprintw(6, 10, "Titre : ");
     getnstr(nouveau.titre, 49);
@@ -118,17 +136,22 @@ void gererSaisieLivre() {
     
     nouveau.nbExemplairesDisponibles = nouveau.nbExemplaires;
     
+    // Sauvegarde du livre
     if(sauvegarderLivre("livres.txt", &nouveau)) {
         mvprintw(23, 2, "Livre enregistre avec succes !");
     }else {
         mvprintw(23, 2, "Erreur lors de l'enregistrement !");
     }
     
+    // Restauration des paramètres d'affichage
     noecho();
     curs_set(0);
-    getch();
+    getch();  // Attente d'une saisie utilisateur
 }
 
+/**
+ * Affiche la liste des livres avec défilement
+ */
 void afficherListeLivres() {
     int ch;
     chargerLivres("livres.txt", livres, &total_livres);
@@ -137,17 +160,20 @@ void afficherListeLivres() {
         clear();
         mvprintw(2, 35, "LISTE DES LIVRES (%d/%d)", start_index + 1, total_livres);
         
+        // Affiche une page de livres (adaptée à la taille de l'écran)
         int max_lines = LINES - 6;
         for(int i = 0; i < max_lines && (i + start_index) < total_livres; i++) {
             Livre *l = &livres[i + start_index];
-            mvprintw(5 + i, 3, "%s - %s (%s) | Disp: %d/%d", 
+            mvprintw(5 + i, 3, "%s - %s (%s) | Disp: %d/%d",
                     l->code, l->titre, l->auteur, 
                     l->nbExemplairesDisponibles, l->nbExemplaires);
         }
-        
+
+        // Instructions pour l'utilisateur
         mvprintw(LINES - 2, 2, "↑/↓: Defilement | R: Retour");
         refresh();
         
+        // Gestion des touches de défilement
         ch = getch();
         switch(ch) {
             case KEY_DOWN:
@@ -156,11 +182,11 @@ void afficherListeLivres() {
             case KEY_UP:
                 if(start_index > 0) start_index--;
                 break;
-            case KEY_NPAGE: // Page down
+            case KEY_NPAGE: // Page suivante
                 start_index += max_lines;
                 if(start_index >= total_livres) start_index = total_livres - 1;
                 break;
-            case KEY_PPAGE: // Page up
+            case KEY_PPAGE: // Page précédente
                 start_index -= max_lines;
                 if(start_index < 0) start_index = 0;
                 break;
@@ -168,19 +194,24 @@ void afficherListeLivres() {
     } while(ch != 'R' && ch != 'r');
 }
 
+/**
+ * Interface pour emprunter un livre
+ */
 void emprunterLivreGUI(){
     clear();
     char codeLivre[MAX_SAISIE];
     Etudiant etd;
     echo();
     curs_set(1);
+    
+    // Saisie des informations
     mvprintw(2, 30, "EMPRUNT DE LIVRE ou entrer pour quitter ce menu");
     mvprintw(5, 10, "Code du livre : ");
-    getnstr(codeLivre, 9); // 9 : the first 4 chars and the othor 5 numbers
+    getnstr(codeLivre, 9);
     if (codeLivre[0]==0) return;
 
     mvprintw(7, 10, "CNIE :");
-    getnstr(etd.CNIE, 14); // 14 is too much but just in case
+    getnstr(etd.CNIE, 14);
     if (etd.CNIE[0]==0) return;
 
     mvprintw(9, 10, "Nom : ");
@@ -191,9 +222,11 @@ void emprunterLivreGUI(){
     getnstr(etd.prenom, 30);
     if (etd.prenom[0]==0) return;
 
+    // Tentative d'emprunt
     int etat_emprunt = emprunterLivre(&etd, codeLivre);
 
-    if(etat_emprunt == 0){ // emprunterLivre returns 0 if the operation is successful
+    // Affichage du résultat
+    if(etat_emprunt == 0){
         mvprintw(23, 4, "Emprunt effectue avec succes !");
     }else if(etat_emprunt == 1){
         mvprintw(23, 4, "ther is no book with this code");
@@ -202,33 +235,45 @@ void emprunterLivreGUI(){
     }else{
         mvprintw(23, 4, "Erreur lors de l'emprunt !");
     }
+    
     noecho();
     curs_set(0);
     getch();
 }
 
+/**
+ * Interface pour retourner un livre
+ */
 void retournerLivreGUI(){
     clear();
     char codeLivre[MAX_SAISIE];
     Etudiant etd={0};
     echo();
     curs_set(1);
+    
+    // Saisie des informations
     mvprintw(2, 30, "RETOUR DE LIVRE");
     mvprintw(5, 10, "Code du livre : ");
-    getnstr(codeLivre, 9); // 9 : first 4 chars and other 5 nums
+    getnstr(codeLivre, 9);
 
     mvprintw(7, 10, "CNIE :");
-    getnstr(etd.CNIE, 14); // 14 is too much but just in case
+    getnstr(etd.CNIE, 14);
     
-    if(!rendreLivre(&etd, codeLivre)){ // rendrelivre returns 0 if the operation is successful
+    // Tentative de retour
+    if(!rendreLivre(&etd, codeLivre)){
         mvprintw(23, 4, "Retour effectue avec succes !");
     }else{
         mvprintw(23, 4, "Erreur lors du retour !");
     }
+    
     noecho();
     curs_set(0);
     getch();
 }
+
+/**
+ * Affiche la liste des étudiants avec leurs emprunts
+ */
 void afficherListeEtudiant() {
     int ch;
     chargerEtudiant("emprunts.txt", etudiants, &total_etudiants);
@@ -241,13 +286,13 @@ void afficherListeEtudiant() {
         for(int i = 0; i < max_lines && (i + start_index) < total_etudiants; i++) {
             Etudiant *l = &etudiants[i + start_index];
             
-            // Count non-NULL books
+            // Compte les livres empruntés
             int books_count = 0;
             for (int j = 0; j < 10; j++) {
                 if (l->emprunts[j] != NULL) books_count++;
             }
             
-            // Print based on count
+            // Affichage selon le nombre d'emprunts
             if (books_count == 0) {
                 mvprintw(5 + i, 3, "%s - %s %s | Emprunts: Aucun",
                         l->CNIE, l->nom, l->prenom);
@@ -268,11 +313,11 @@ void afficherListeEtudiant() {
             case KEY_UP:
                 if(start_index > 0) start_index--;
                 break;
-            case KEY_NPAGE: // Page down
+            case KEY_NPAGE:
                 start_index += max_lines;
                 if(start_index >= total_livres) start_index = total_livres - 1;
                 break;
-            case KEY_PPAGE: // Page up
+            case KEY_PPAGE:
                 start_index -= max_lines;
                 if(start_index < 0) start_index = 0;
                 break;
@@ -280,6 +325,9 @@ void afficherListeEtudiant() {
     } while(ch != 'R' && ch != 'r');
 }
 
+/**
+ * Interface de recherche de livres
+ */
 void rechercherLivreGUI() {
     Livre *livres = NULL;
     int ch, nbTrouves = 0;
@@ -290,6 +338,7 @@ void rechercherLivreGUI() {
     echo();
     curs_set(1);
 
+    // Menu de recherche
     mvprintw(2, 30, "RECHERCHER UN LIVRE");
     mvprintw(4, 10, "1. Titre");
     mvprintw(5, 10, "2. Auteur");
@@ -307,6 +356,7 @@ void rechercherLivreGUI() {
     clear();
     mvprintw(2, 30, "RECHERCHER UN LIVRE (Entrer pour quitter)");
 
+    // Saisie du critère selon le type choisi
     switch (choix) {
         case 1:
             mvprintw(4, 30, "Titre : ");
@@ -336,6 +386,7 @@ void rechercherLivreGUI() {
         mvprintw(6, 30, "Aucun livre trouvé !");
         getch();
     } else { 
+        // Affichage des résultats avec défilement
         do {
             clear();
             mvprintw(2, 30, "LISTE DES LIVRES (%d/%d)", start_index + 1, nbTrouves);
@@ -372,7 +423,7 @@ void rechercherLivreGUI() {
         } while (ch != 'R' && ch != 'r');
     }
 
-    if (livres) free(livres);  // Libération mémoire
+    if (livres) free(livres);  // Libération de la mémoire
     noecho();
     curs_set(0);
 }
