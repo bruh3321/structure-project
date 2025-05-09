@@ -5,6 +5,13 @@
 #include "storagemanagement.h"
 #include "structs.h"
 
+/**
+ * Charge les livres depuis un fichier
+ * @param filename Nom du fichier à charger
+ * @param livres Tableau de livres où stocker les données
+ * @param total Pointeur pour retourner le nombre total de livres chargés
+ * @return 1 si succès, 0 si échec
+ */
 int chargerLivres(const char* filename, Livre *livres, int *total) {
     *total = 0;
     FILE *fichier = fopen(filename, "r");
@@ -26,6 +33,13 @@ int chargerLivres(const char* filename, Livre *livres, int *total) {
     return 1;
 }
 
+/**
+ * Charge les étudiants depuis un fichier
+ * @param filename Nom du fichier à charger
+ * @param etudiants Tableau d'étudiants où stocker les données
+ * @param total Pointeur pour retourner le nombre total d'étudiants chargés
+ * @return 1 si succès, 0 si échec
+ */
 int chargerEtudiant(const char* filename, Etudiant *etudiants, int *total) {
     *total = 0;
     FILE *fichier = fopen(filename, "r");
@@ -36,38 +50,38 @@ int chargerEtudiant(const char* filename, Etudiant *etudiants, int *total) {
 
     char line[512];
     while (*total < MAX_ETUDIANTS && fgets(line, sizeof(line), fichier)) {
-        // Initialize all emprunts to empty strings
+        // Initialise tous les emprunts à des chaînes vides
         for (int i = 0; i < 10; i++) {
             etudiants[*total].emprunts[i][0] = '\0';
         }
 
-        // Use temporary variables for safer parsing
+        // Utilise des variables temporaires pour un parsing plus sûr
         char prenom[50], nom[50], cnie[20];
         int count = sscanf(line, "%49s %49s %19s", prenom, nom, cnie);
         
-        if (count < 3) continue;  // Skip invalid lines
+        if (count < 3) continue;  // Ignore les lignes invalides
 
-        // Copy the basic info
+        // Copie les informations de base
         strncpy(etudiants[*total].prenom, prenom, sizeof(etudiants[*total].prenom) - 1);
         strncpy(etudiants[*total].nom, nom, sizeof(etudiants[*total].nom) - 1);
         strncpy(etudiants[*total].CNIE, cnie, sizeof(etudiants[*total].CNIE) - 1);
 
-        // Parse book loans
+        // Parse les emprunts de livres
         char *ptr = line;
-        // Skip the first three fields
+        // Saute les trois premiers champs
         for (int i = 0; i < 3; i++) {
-            ptr += strcspn(ptr, " \t");  // Skip current field
-            ptr += strspn(ptr, " \t");   // Skip whitespace
+            ptr += strcspn(ptr, " \t");  // Saute le champ courant
+            ptr += strspn(ptr, " \t");   // Saute les espaces
         }
 
-        // Parse up to 10 book codes
+        // Parse jusqu'à 10 codes de livre
         for (int i = 0; i < 10 && *ptr != '\0' && *ptr != '\n'; i++) {
             int len = strcspn(ptr, " \t\n");
             if (len > 0) {
                 strncpy(etudiants[*total].emprunts[i], ptr, len);
                 etudiants[*total].emprunts[i][len] = '\0';
                 ptr += len;
-                ptr += strspn(ptr, " \t");  // Skip whitespace
+                ptr += strspn(ptr, " \t");  // Saute les espaces
             }
         }
 
@@ -78,6 +92,12 @@ int chargerEtudiant(const char* filename, Etudiant *etudiants, int *total) {
     return 1;
 }
 
+/**
+ * Sauvegarde un livre dans un fichier
+ * @param filename Nom du fichier
+ * @param l Pointeur vers le livre à sauvegarder
+ * @return 1 si succès, 0 si échec
+ */
 int sauvegarderLivre(const char* filename, Livre *l) {
     FILE *fichier = fopen(filename, "a");
     if (!fichier) {
@@ -93,7 +113,14 @@ int sauvegarderLivre(const char* filename, Livre *l) {
     return 1;
 }
 
-
+/**
+ * Recherche des livres selon un critère
+ * @param filename Nom du fichier à chercher
+ * @param critere Valeur à rechercher
+ * @param type Type de recherche (0=code, 1=titre, 2=auteur, 3=année)
+ * @param nbTrouves Pointeur pour retourner le nombre de résultats
+ * @return Tableau de livres trouvés ou NULL
+ */
 Livre* rechercherLivres(const char* filename, const char* critere, int type, int* nbTrouves) {
     FILE *fichier = fopen(filename, "r");
     if (!fichier) {
@@ -117,10 +144,10 @@ Livre* rechercherLivres(const char* filename, const char* critere, int type, int
 
         int match = 0;
         switch (type) {
-            case 0: match = (strcmp(temp.code, critere) == 0); break;
-            case 1: match = (strcmp(temp.titre, critere) == 0); break;
-            case 2: match = (strcmp(temp.auteur, critere) == 0); break;
-            case 3: match = (temp.annee == atoi(critere)); break;
+            case 0: match = (strcmp(temp.code, critere) == 0); break;  // Recherche par code
+            case 1: match = (strcmp(temp.titre, critere) == 0); break;  // Recherche par titre
+            case 2: match = (strcmp(temp.auteur, critere) == 0); break;  // Recherche par auteur
+            case 3: match = (temp.annee == atoi(critere)); break;  // Recherche par année
             default: match = 0;
         }
 
@@ -132,7 +159,7 @@ Livre* rechercherLivres(const char* filename, const char* critere, int type, int
     fclose(fichier);
     *nbTrouves = count;
 
-    // Si aucun livre trouvé, libérer la mémoire et retourner NULL
+    // Si aucun livre trouvé, libère la mémoire et retourne NULL
     if (count == 0) {
         free(resultats);
         return NULL;
@@ -140,8 +167,14 @@ Livre* rechercherLivres(const char* filename, const char* critere, int type, int
     return resultats;
 }
 
+/**
+ * Permet à un étudiant d'emprunter un livre
+ * @param etudiant Pointeur vers l'étudiant
+ * @param codeLivre Code du livre à emprunter
+ * @return 1 si succès, 2 si pas d'exemplaires disponibles, -1 si erreur
+ */
 int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
-    // Book borrowing section - Fixed book existence check
+    // Vérification de l'existence du livre
     FILE *fichier = fopen("livres.txt", "r");
     if (!fichier) return 1;
     
@@ -159,7 +192,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
             if (livre.nbExemplairesDisponibles > 0) {
                 livre.nbExemplairesDisponibles--;
             } else {
-                return 2;  // Book exists but no copies available
+                return 2;  // Livre existe mais pas d'exemplaires disponibles
             }
         }
         
@@ -173,9 +206,9 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
     remove("livres.txt");
     rename("tmp.txt", "livres.txt");
 
-    if (!book_exists) return 1;  // Book doesn't exist at all
+    if (!book_exists) return 1;  // Livre n'existe pas
 
-    // Student borrowing section - Fixed data persistence
+    // Gestion de l'emprunt par l'étudiant
     FILE *etd_emprunt = fopen("emprunts.txt", "r");
     FILE *tmp_emprunt = fopen("tmp_emprunt.txt", "w");
     if (!tmp_emprunt) { 
@@ -205,7 +238,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
             }
         }
 
-        // Write all fields with NULL placeholder
+        // Écrit tous les champs avec le marqueur NULL
         fprintf(tmp_emprunt, "%s %s %s %s %s %s %s %s %s %s %s %s %s\n", 
                 etd.prenom, etd.nom, etd.CNIE,
                 etd.emprunts[0], etd.emprunts[1], etd.emprunts[2],
@@ -230,9 +263,15 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
         }
     }
     
-    return 1; //success
+    return 1; //succès
 }
 
+/**
+ * Permet à un étudiant de rendre un livre
+ * @param etudiant Pointeur vers l'étudiant
+ * @param codeLivre Code du livre à rendre
+ * @return 0 si succès, 1 si erreur
+ */
 int rendreLivre(Etudiant* etudiant, const char* codeLivre) {
     FILE *livres = fopen("livres.txt", "r");
     FILE *fichier = fopen("emprunts.txt", "r");
@@ -244,6 +283,7 @@ int rendreLivre(Etudiant* etudiant, const char* codeLivre) {
         return 1;
     }
 
+    // Met à jour le nombre d'exemplaires disponibles
     Livre livre;
     int state = 0;
     while (fscanf(livres, "%s %s %s %d %d %d", 
@@ -254,7 +294,7 @@ int rendreLivre(Etudiant* etudiant, const char* codeLivre) {
             if (livre.nbExemplairesDisponibles < livre.nbExemplaires) {
                 livre.nbExemplairesDisponibles++;
             } else {
-                state = 1;
+                state = 1;  // Erreur: trop d'exemplaires
             }
         }
         fprintf(tmp, "%s %s %s %d %d %d\n", 
@@ -267,6 +307,7 @@ int rendreLivre(Etudiant* etudiant, const char* codeLivre) {
     remove("livres.txt");
     rename("tmp.txt", "livres.txt");
 
+    // Met à jour la liste des emprunts de l'étudiant
     FILE *etd_emprunt_tmp = fopen("tmp_emprunt.txt", "w");
     Etudiant etd;
     rewind(fichier);
@@ -280,7 +321,7 @@ int rendreLivre(Etudiant* etudiant, const char* codeLivre) {
         if (strcmp(etd.CNIE, etudiant->CNIE) == 0) {
             for (int i = 0; i < 10; i++) {
                 if (strcmp(etd.emprunts[i], codeLivre) == 0) {
-                    strcpy(etd.emprunts[i], "NULL");
+                    strcpy(etd.emprunts[i], "NULL");  // Libère l'emprunt
                     num_emprunt += 1;
                     break;
                 }else if(strcmp(etd.emprunts[i],"NULL")){
