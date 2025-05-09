@@ -161,7 +161,7 @@ Livre* rechercherLivres(const char* filename, const char* critere, int type, int
                   temp.code, titre_temp, auteur_temp,
                   &temp.annee, &temp.nbExemplaires, &temp.nbExemplairesDisponibles) == 6) {
 
-        // Convert asterisks to spaces for display
+        // Remplacement des * par des espaces
         strcpy(temp.titre, titre_temp);
         strcpy(temp.auteur, auteur_temp);
         for (int i = 0; temp.titre[i]; i++) if (temp.titre[i] == '*') temp.titre[i] = ' ';
@@ -181,6 +181,7 @@ Livre* rechercherLivres(const char* filename, const char* critere, int type, int
             if (count >= MAX_LIVRES) break;
         }
     }
+
     fclose(fichier);
     *nbTrouves = count;
 
@@ -188,8 +189,16 @@ Livre* rechercherLivres(const char* filename, const char* critere, int type, int
         free(resultats);
         return NULL;
     }
-    return resultats;
+
+    // Optionnel : réduire la taille du tableau
+    Livre *vraieListe = realloc(resultats, sizeof(Livre) * count);
+    if (!vraieListe) {
+        // Si realloc échoue, retourne le tableau original
+        return resultats;
+    }
+    return vraieListe;
 }
+
 
 /**
  * Permet à un étudiant d'emprunter un livre
