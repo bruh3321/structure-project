@@ -19,13 +19,23 @@ int chargerLivres(const char* filename, Livre *livres, int *total) {
 
     char line[256];
     while(fgets(line, sizeof(line), fichier) && *total < MAX_LIVRES) {
+        char titre_temp[50], auteur_temp[50];
         if(sscanf(line, "%s %s %s %d %d %d", 
                livres[*total].code, 
-               livres[*total].titre, 
-               livres[*total].auteur,
+               titre_temp, 
+               auteur_temp,
                &livres[*total].annee, 
                &livres[*total].nbExemplaires, 
                &livres[*total].nbExemplairesDisponibles) == 6) {
+            
+            // Convert asterisks back to spaces
+            strcpy(livres[*total].titre, titre_temp);
+            strcpy(livres[*total].auteur, auteur_temp);
+            for (int i = 0; livres[*total].titre[i]; i++) 
+                if (livres[*total].titre[i] == '*') livres[*total].titre[i] = ' ';
+            for (int i = 0; livres[*total].auteur[i]; i++) 
+                if (livres[*total].auteur[i] == '*') livres[*total].auteur[i] = ' ';
+            
             (*total)++;
         }
     }
@@ -104,8 +114,16 @@ int sauvegarderLivre(const char* filename, Livre *l) {
         return 0;
     }
     
+    // Replace spaces with asterisks in title and author
+    char titre_temp[50], auteur_temp[50];
+    strcpy(titre_temp, l->titre);
+    strcpy(auteur_temp, l->auteur);
+    
+    for (int i = 0; titre_temp[i]; i++) if (titre_temp[i] == ' ') titre_temp[i] = '*';
+    for (int i = 0; auteur_temp[i]; i++) if (auteur_temp[i] == ' ') auteur_temp[i] = '*';
+    
     fprintf(fichier, "%s %s %s %d %d %d\n", 
-           l->code, l->titre, l->auteur, 
+           l->code, titre_temp, auteur_temp, 
            l->annee, l->nbExemplaires, 
            l->nbExemplairesDisponibles);
     
@@ -124,30 +142,37 @@ int sauvegarderLivre(const char* filename, Livre *l) {
 Livre* rechercherLivres(const char* filename, const char* critere, int type, int* nbTrouves) {
     FILE *fichier = fopen(filename, "r");
     if (!fichier) {
-        *nbTrouves = -1;  // Erreur ouverture fichier
+        *nbTrouves = -1;
         return NULL;
     }
 
     Livre *resultats = (Livre*)malloc(sizeof(Livre) * MAX_LIVRES);
     if (!resultats) {
         fclose(fichier);
-        *nbTrouves = -2;  // Erreur allocation
+        *nbTrouves = -2;
         return NULL;
     }
 
     Livre temp;
+    char titre_temp[50], auteur_temp[50];
     int count = 0;
 
     while (fscanf(fichier, "%s %s %s %d %d %d",
-                  temp.code, temp.titre, temp.auteur,
+                  temp.code, titre_temp, auteur_temp,
                   &temp.annee, &temp.nbExemplaires, &temp.nbExemplairesDisponibles) == 6) {
+
+        // Convert asterisks to spaces for display
+        strcpy(temp.titre, titre_temp);
+        strcpy(temp.auteur, auteur_temp);
+        for (int i = 0; temp.titre[i]; i++) if (temp.titre[i] == '*') temp.titre[i] = ' ';
+        for (int i = 0; temp.auteur[i]; i++) if (temp.auteur[i] == '*') temp.auteur[i] = ' ';
 
         int match = 0;
         switch (type) {
-            case 0: match = (strcmp(temp.code, critere) == 0); break;  // Recherche par code
-            case 1: match = (strcmp(temp.titre, critere) == 0); break;  // Recherche par titre
-            case 2: match = (strcmp(temp.auteur, critere) == 0); break;  // Recherche par auteur
-            case 3: match = (temp.annee == atoi(critere)); break;  // Recherche par année
+            case 0: match = (strcmp(temp.code, critere) == 0); break;
+            case 1: match = (strcmp(temp.titre, critere) == 0); break;
+            case 2: match = (strcmp(temp.auteur, critere) == 0); break;
+            case 3: match = (temp.annee == atoi(critere)); break;
             default: match = 0;
         }
 
@@ -159,7 +184,6 @@ Livre* rechercherLivres(const char* filename, const char* critere, int type, int
     fclose(fichier);
     *nbTrouves = count;
 
-    // Si aucun livre trouvé, libère la mémoire et retourne NULL
     if (count == 0) {
         free(resultats);
         return NULL;
@@ -174,7 +198,6 @@ Livre* rechercherLivres(const char* filename, const char* critere, int type, int
  * @return 1 si succès, 2 si pas d'exemplaires disponibles, -1 si erreur
  */
 int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
-    // Vérification de l'existence du livre
     FILE *fichier = fopen("livres.txt", "r");
     if (!fichier) return 1;
     
@@ -182,22 +205,27 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
     if (!tmp) { fclose(fichier); return 1; }
     
     Livre livre;
+    char titre_temp[50], auteur_temp[50];
     int book_exists = 0;
     while (fscanf(fichier, "%s %s %s %d %d %d", 
-           livre.code, livre.titre, livre.auteur,
+           livre.code, titre_temp, auteur_temp,
            &livre.annee, &livre.nbExemplaires, &livre.nbExemplairesDisponibles) == 6) {
+        
+        // Convert back to original format for comparison
+        strcpy(livre.titre, titre_temp);
+        strcpy(livre.auteur, auteur_temp);
         
         if (!strcmp(livre.code, codeLivre)) {
             book_exists = 1;
             if (livre.nbExemplairesDisponibles > 0) {
                 livre.nbExemplairesDisponibles--;
             } else {
-                return 2;  // Livre existe mais pas d'exemplaires disponibles
+                return 2;
             }
         }
         
         fprintf(tmp, "%s %s %s %d %d %d\n", 
-               livre.code, livre.titre, livre.auteur,
+               livre.code, titre_temp, auteur_temp,
                livre.annee, livre.nbExemplaires, livre.nbExemplairesDisponibles);
     }
     
@@ -206,7 +234,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
     remove("livres.txt");
     rename("tmp.txt", "livres.txt");
 
-    if (!book_exists) return 1;  // Livre n'existe pas
+    if (!book_exists) return 1;
 
     // Gestion de l'emprunt par l'étudiant
     FILE *etd_emprunt = fopen("emprunts.txt", "r");
@@ -283,22 +311,22 @@ int rendreLivre(Etudiant* etudiant, const char* codeLivre) {
         return 1;
     }
 
-    // Met à jour le nombre d'exemplaires disponibles
     Livre livre;
+    char titre_temp[50], auteur_temp[50];
     int state = 0;
     while (fscanf(livres, "%s %s %s %d %d %d", 
-            livre.code, livre.titre, livre.auteur,
+            livre.code, titre_temp, auteur_temp,
             &livre.annee, &livre.nbExemplaires, 
             &livre.nbExemplairesDisponibles) == 6) {
         if (strcmp(livre.code, codeLivre) == 0) {
             if (livre.nbExemplairesDisponibles < livre.nbExemplaires) {
                 livre.nbExemplairesDisponibles++;
             } else {
-                state = 1;  // Erreur: trop d'exemplaires
+                state = 1;
             }
         }
         fprintf(tmp, "%s %s %s %d %d %d\n", 
-                livre.code, livre.titre, livre.auteur,
+                livre.code, titre_temp, auteur_temp,
                 livre.annee, livre.nbExemplaires, 
                 livre.nbExemplairesDisponibles);
     }
