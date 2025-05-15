@@ -329,7 +329,7 @@ void afficherListeEtudiant() {
  * Interface de recherche de livres
  */
 void rechercherLivreGUI() {
-    Livre *livres = NULL;
+    list_simple *livres = NULL;
     int ch, nbTrouves = 0;
     int start_index = 0;
     char critere[MAX_SAISIE];
@@ -350,13 +350,11 @@ void rechercherLivreGUI() {
 
     int choix = getch() - '0';
     if (choix < 0 || choix > 4) return;
-
-    if (choix == 4) return;  // Retour au menu principal
+    if (choix == 4) return;
 
     clear();
     mvprintw(2, 30, "RECHERCHER UN LIVRE (Entrer pour quitter)");
 
-    // Saisie du critère selon le type choisi
     switch (choix) {
         case 1:
             mvprintw(4, 30, "Titre : ");
@@ -378,22 +376,25 @@ void rechercherLivreGUI() {
             getnstr(critere, 10);
             livres = rechercherLivres("livres.txt", critere, 0, &nbTrouves);
             break;
-        default:
-            break;
     }
 
     if (livres == NULL || nbTrouves <= 0) {
         mvprintw(6, 30, "Aucun livre trouvé !");
         getch();
-    } else { 
-        // Affichage des résultats avec défilement
+    } else {
+        // Transformer liste chaînée en tableau pour faciliter le défilement
+        Livre **tableau = (Livre**)malloc(nbTrouves * sizeof(Livre*));
+        list_simple *tmp = livres;
+        for (int i = 0; i < nbTrouves && tmp != NULL; i++, tmp = tmp->suivant)
+            tableau[i] = tmp->liver;
+
         do {
             clear();
             mvprintw(2, 30, "LISTE DES LIVRES (%d/%d)", start_index + 1, nbTrouves);
 
             int max_lines = LINES - 6;
             for (int i = 0; i < max_lines && (i + start_index) < nbTrouves; i++) {
-                Livre *l = &livres[i + start_index]; 
+                Livre *l = tableau[i + start_index];
                 mvprintw(5 + i, 3, "%s - %s (%s) | Annee: %d | Disp: %d/%d",
                          l->code, l->titre, l->auteur, l->annee,
                          l->nbExemplairesDisponibles, l->nbExemplaires);
@@ -420,10 +421,12 @@ void rechercherLivreGUI() {
                     break;
             }
 
-        } while (ch != 'R' && ch != 'r');
+        } while (ch != 'r' && ch != 'R');
+
+        free(tableau); // Libération du tableau temporaire
     }
 
-    if (livres) free(livres);  // Libération de la mémoire
+    if (livres) libererListe(livres); // Libération de la liste
     noecho();
     curs_set(0);
 }

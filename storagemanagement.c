@@ -139,31 +139,23 @@ int sauvegarderLivre(const char* filename, Livre *l) {
  * @param nbTrouves Pointeur pour retourner le nombre de résultats
  * @return Tableau de livres trouvés ou NULL
  */
-Livre* rechercherLivres(const char* filename, const char* critere, int type, int* nbTrouves) {
+list_simple* rechercherLivres(const char* filename, const char* critere, int type, int* nbTrouves) {
     FILE *fichier = fopen(filename, "r");
     if (!fichier) {
         *nbTrouves = -1;
         return NULL;
     }
 
-    Livre *resultats = (Livre*)malloc(sizeof(Livre) * MAX_LIVRES);
-    if (!resultats) {
-        fclose(fichier);
-        *nbTrouves = -2;
-        return NULL;
-    }
+    list_simple *premier_livre = NULL, *courant = NULL;
+    *nbTrouves = 0;
 
     Livre temp;
-    char titre_temp[50], auteur_temp[50];
-    int count = 0;
 
     while (fscanf(fichier, "%s %s %s %d %d %d",
-                  temp.code, titre_temp, auteur_temp,
+                  temp.code, temp.titre, temp.auteur,
                   &temp.annee, &temp.nbExemplaires, &temp.nbExemplairesDisponibles) == 6) {
 
         // Remplacement des * par des espaces
-        strcpy(temp.titre, titre_temp);
-        strcpy(temp.auteur, auteur_temp);
         for (int i = 0; temp.titre[i]; i++) if (temp.titre[i] == '*') temp.titre[i] = ' ';
         for (int i = 0; temp.auteur[i]; i++) if (temp.auteur[i] == '*') temp.auteur[i] = ' ';
 
@@ -173,32 +165,65 @@ Livre* rechercherLivres(const char* filename, const char* critere, int type, int
             case 1: match = (strcmp(temp.titre, critere) == 0); break;
             case 2: match = (strcmp(temp.auteur, critere) == 0); break;
             case 3: match = (temp.annee == atoi(critere)); break;
-            default: match = 0;
         }
 
         if (match) {
-            resultats[count++] = temp;
-            if (count >= MAX_LIVRES) break;
+            list_simple *nouveau = (list_simple*)malloc(sizeof(list_simple));
+            if (!nouveau) continue;
+
+            nouveau->liver = (Livre*)malloc(sizeof(Livre));
+            if (!nouveau->liver) {
+                free(nouveau);
+                continue;
+            }
+
+            *(nouveau->liver) = temp;
+            nouveau->suivant = NULL;
+
+            if (premier_livre == NULL) {
+                premier_livre = nouveau;
+                courant = nouveau;
+            } else {
+                courant->suivant = nouveau;
+                courant = nouveau;
+            }
+
+            (*nbTrouves)++;
         }
     }
 
     fclose(fichier);
-    *nbTrouves = count;
 
-    if (count == 0) {
-        free(resultats);
+    if (*nbTrouves == 0 && premier_livre != NULL) {
+        // Aucun livre trouvé mais liste allouée par erreur
+        // (sécurité redondante ici)
+        list_simple *tmp;
+        while (premier_livre) {
+            tmp = premier_livre;
+            premier_livre = premier_livre->suivant;
+            free(tmp->liver);
+            free(tmp);
+        }
         return NULL;
     }
 
-    // Optionnel : réduire la taille du tableau
-    Livre *vraieListe = realloc(resultats, sizeof(Livre) * count);
-    if (!vraieListe) {
-        // Si realloc échoue, retourne le tableau original
-        return resultats;
-    }
-    return vraieListe;
+    return premier_livre;
 }
 
+/**
+ * Libère la mémoire occupée par une liste simplement chaînée de livres.
+ *
+ * @param tete Pointeur vers la tête de la liste à libérer.
+ */
+void libererListe(list_simple* tete) {
+    list_simple* tmp;
+    while (tete) {
+        tmp = tete;
+        tete = tete->suivant;
+        free(tmp->liver);
+        free(tmp);
+    }
+}
 
 /**
  * Permet à un étudiant d'emprunter un livre

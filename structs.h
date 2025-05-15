@@ -17,4 +17,9 @@ typedef struct {
     char emprunts[10][10]; // 10 emprunts de 10 caractères
 } Etudiant;
 
+typedef struct list_simple{
+    Livre *liver;
+    struct list_simple *suivant;
+}list_simple;
+
 #endif
