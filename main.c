@@ -93,10 +93,12 @@ void afficherMenuPrincipal() {
     // Affichage des options du menu
     mvprintw(5, 30, "1. Ajouter un livre");
     mvprintw(6, 30, "2. Liste des livres");
-    mvprintw(7, 30, "3. Emprunter un livre");
-    mvprintw(8, 30, "4. Retourner un livre");
-    mvprintw(9, 30, "5. Liste des etudiants");
-    mvprintw(10, 30, "6. rechercher un livre");
+    mvprintw(7, 30, "3. Supprimer un livre");
+    mvprintw(8, 30, "4. Emprunter un livre");
+    mvprintw(9, 30, "5. Retourner un livre");
+    mvprintw(10, 30, "6. Liste des etudiants");
+    mvprintw(11, 30, "7. rechercher un livre");
+    
     mvprintw(11, 30, "Q. Quitter");
     
     attron(COLOR_PAIR(2));
