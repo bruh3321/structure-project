@@ -1,4 +1,4 @@
-**Bibliotheque** – Library Management System
+# Bibliotheque – Library Management System
 
 This is a mini project for managing a library, developed as part of a data structures course.
 It demonstrates the use of structures, pointers, and file operations in C, with a simple ncurses-based terminal interface.

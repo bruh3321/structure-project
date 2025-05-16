@@ -325,7 +325,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
         }
     }
     
-    return 1; //succès
+    return 0; //succès
 }
 
 /**
