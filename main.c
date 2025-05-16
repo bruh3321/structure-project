@@ -83,16 +83,16 @@ int main() {
 void afficherMenuPrincipal() {
     clear();
     attron(COLOR_PAIR(1));
-    mvprintw(2, 35, "GESTION DE LA BIBLIOTHÈQUE");
+    mvprintw(2, 35, "GESTION BIBLIOTHEQUE");
     attroff(COLOR_PAIR(1));
 
     // Affichage des options du menu
     mvprintw(5, 30, "1. Ajouter un livre");
-    mvprintw(6, 30, "2. Afficher la liste des livres");
+    mvprintw(6, 30, "2. Liste des livres");
     mvprintw(7, 30, "3. Emprunter un livre");
     mvprintw(8, 30, "4. Retourner un livre");
-    mvprintw(9, 30, "5. Afficher la liste des étudiants");
-    mvprintw(10, 30, "6. Rechercher un livre");
+    mvprintw(9, 30, "5. Liste des etudiants");
+    mvprintw(10, 30, "6. rechercher un livre");
     mvprintw(11, 30, "q. Quitter");
     
     attron(COLOR_PAIR(2));
@@ -113,7 +113,7 @@ void gererSaisieLivre() {
     curs_set(1);
     
     // Saisie des informations du livre
-    mvprintw(2, 30, "NOUVEAU LIVRE (appuyez sur Entrée pour quitter)");
+    mvprintw(2, 30, "NOUVEAU LIVRE (entrer pour sortir)");
     mvprintw(5, 10, "Code : ");
     getnstr(nouveau.code, 9);
     if (nouveau.code[0]==0) return;  // Sortie si champ vide
@@ -126,11 +126,11 @@ void gererSaisieLivre() {
     getnstr(nouveau.auteur, 49);
     if (nouveau.auteur[0]==0) return;
     
-    mvprintw(8, 10, "Année : ");
+    mvprintw(8, 10, "Annee : ");
     scanw("%d", &nouveau.annee);
     if (nouveau.annee==0) return;
     
-    mvprintw(9, 10, "Nombre d'exemplaires : ");
+    mvprintw(9, 10, "Exemplaires : ");
     scanw("%d", &nouveau.nbExemplaires);
     if (nouveau.nbExemplaires==0) return;
     
@@ -138,7 +138,7 @@ void gererSaisieLivre() {
     
     // Sauvegarde du livre
     if(sauvegarderLivre("livres.txt", &nouveau)) {
-        mvprintw(23, 2, "Livre enregistré avec succès !");
+        mvprintw(23, 2, "Livre enregistre avec succes !");
     }else {
         mvprintw(23, 2, "Erreur lors de l'enregistrement !");
     }
@@ -164,13 +164,13 @@ void afficherListeLivres() {
         int max_lines = LINES - 6;
         for(int i = 0; i < max_lines && (i + start_index) < total_livres; i++) {
             Livre *l = &livres[i + start_index];
-            mvprintw(5 + i, 3, "%s - %s (%s) | Dispo : %d/%d",
+            mvprintw(5 + i, 3, "%s - %s (%s) | Disp: %d/%d",
                     l->code, l->titre, l->auteur, 
                     l->nbExemplairesDisponibles, l->nbExemplaires);
         }
 
         // Instructions pour l'utilisateur
-        mvprintw(LINES - 2, 2, "↑/↓ : Défilement | R : Retour");
+        mvprintw(LINES - 2, 2, "↑/↓: Defilement | R: Retour");
         refresh();
         
         // Gestion des touches de défilement
@@ -205,7 +205,7 @@ void emprunterLivreGUI(){
     curs_set(1);
     
     // Saisie des informations
-    mvprintw(2, 30, "EMPRUNT DE LIVRE (appuyez sur Entrée pour quitter ce menu)");
+    mvprintw(2, 30, "EMPRUNT DE LIVRE ou entrer pour quitter ce menu");
     mvprintw(5, 10, "Code du livre : ");
     getnstr(codeLivre, 9);
     if (codeLivre[0]==0) return;
@@ -218,7 +218,7 @@ void emprunterLivreGUI(){
     getnstr(etd.nom, 30);
     if (etd.nom[0]==0) return;
 
-    mvprintw(11, 10, "Prénom : ");
+    mvprintw(11, 10, "Prenom : ");
     getnstr(etd.prenom, 30);
     if (etd.prenom[0]==0) return;
 
@@ -227,11 +227,11 @@ void emprunterLivreGUI(){
 
     // Affichage du résultat
     if(etat_emprunt == 0){
-        mvprintw(23, 4, "Emprunt effectué avec succès !");
+        mvprintw(23, 4, "Emprunt effectue avec succes !");
     }else if(etat_emprunt == 1){
-        mvprintw(23, 4, "Aucun livre avec ce code n'existe !");
+        mvprintw(23, 4, "ther is no book with this code");
     }else if(etat_emprunt == 2){
-        mvprintw(23, 4, "Aucune copie disponible !");
+        mvprintw(23, 4, "no copies available");
     }else{
         mvprintw(23, 4, "Erreur lors de l'emprunt !");
     }
@@ -261,7 +261,7 @@ void retournerLivreGUI(){
     
     // Tentative de retour
     if(!rendreLivre(&etd, codeLivre)){
-        mvprintw(23, 4, "Retour effectué avec succès !");
+        mvprintw(23, 4, "Retour effectue avec succes !");
     }else{
         mvprintw(23, 4, "Erreur lors du retour !");
     }
@@ -280,7 +280,7 @@ void afficherListeEtudiant() {
     
     do {
         clear();
-        mvprintw(2, 35, "LISTE DES ÉTUDIANTS (%d/%d)", start_index + 1, total_etudiants);
+        mvprintw(2, 35, "LISTE DES ETUDIANT (%d/%d)", start_index + 1, total_etudiants);
         
         int max_lines = LINES - 6;
         for(int i = 0; i < max_lines && (i + start_index) < total_etudiants; i++) {
@@ -294,28 +294,28 @@ void afficherListeEtudiant() {
             
             // Affichage selon le nombre d'emprunts
             if (books_count == 0) {
-                mvprintw(5 + i, 3, "%s - %s %s | Emprunts : Aucun",
+                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: Aucun",
                         l->CNIE, l->nom, l->prenom);
             } else {
-                mvprintw(5 + i, 3, "%s - %s %s | Emprunts : %s (+%d restant(s) ouvert(s))",
+                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s (+%d restant(s) ouvert(s))",
                         l->CNIE, l->nom, l->prenom, l->emprunts[0], books_count-1);
             }
         }
         
-        mvprintw(LINES - 2, 2, "↑/↓ : Défilement | R : Retour");
+        mvprintw(LINES - 2, 2, "↑/↓: Defilement | R: Retour");
         refresh();
         
         ch = getch();
         switch(ch) {
             case KEY_DOWN:
-                if(start_index < total_etudiants - 1) start_index++;
+                if(start_index < total_livres - 1) start_index++;
                 break;
             case KEY_UP:
                 if(start_index > 0) start_index--;
                 break;
             case KEY_NPAGE:
                 start_index += max_lines;
-                if(start_index >= total_etudiants) start_index = total_etudiants - 1;
+                if(start_index >= total_livres) start_index = total_livres - 1;
                 break;
             case KEY_PPAGE:
                 start_index -= max_lines;
@@ -340,12 +340,12 @@ void rechercherLivreGUI() {
 
     // Menu de recherche
     mvprintw(2, 30, "RECHERCHER UN LIVRE");
-    mvprintw(4, 10, "1. Par titre");
-    mvprintw(5, 10, "2. Par auteur");
-    mvprintw(6, 10, "3. Par année");
-    mvprintw(7, 10, "0. Par code");
+    mvprintw(4, 10, "1. Titre");
+    mvprintw(5, 10, "2. Auteur");
+    mvprintw(6, 10, "3. Annee");
+    mvprintw(7, 10, "0. Code");
     mvprintw(8, 10, "4. Retour au menu principal");
-    mvprintw(10, 10, "Votre choix : ");
+    mvprintw(10, 10, "Choix : ");
     refresh();
 
     int choix = getch() - '0';
@@ -353,7 +353,7 @@ void rechercherLivreGUI() {
     if (choix == 4) return;
 
     clear();
-    mvprintw(2, 30, "RECHERCHER UN LIVRE (appuyez sur Entrée pour quitter)");
+    mvprintw(2, 30, "RECHERCHER UN LIVRE (Entrer pour quitter)");
 
     switch (choix) {
         case 1:
@@ -367,7 +367,7 @@ void rechercherLivreGUI() {
             livres = rechercherLivres("livres.txt", critere, 2, &nbTrouves);
             break;
         case 3:
-            mvprintw(4, 30, "Année : ");
+            mvprintw(4, 30, "Annee : ");
             getnstr(critere, 4);
             livres = rechercherLivres("livres.txt", critere, 3, &nbTrouves);
             break;
@@ -395,12 +395,12 @@ void rechercherLivreGUI() {
             int max_lines = LINES - 6;
             for (int i = 0; i < max_lines && (i + start_index) < nbTrouves; i++) {
                 Livre *l = tableau[i + start_index];
-                mvprintw(5 + i, 3, "%s - %s (%s) | Année : %d | Dispo : %d/%d",
+                mvprintw(5 + i, 3, "%s - %s (%s) | Annee: %d | Disp: %d/%d",
                          l->code, l->titre, l->auteur, l->annee,
                          l->nbExemplairesDisponibles, l->nbExemplaires);
             }
 
-            mvprintw(LINES - 2, 2, "↑/↓ : Défilement | PgUp/PgDn : Page | R : Retour");
+            mvprintw(LINES - 2, 2, "↑/↓: Defilement | PgUp/PgDn: Page | R: Retour");
             refresh();
 
             ch = getch();
