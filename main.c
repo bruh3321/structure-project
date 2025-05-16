@@ -454,7 +454,7 @@ void gererSuppressionLivre(){
     if (supprimerLivre(supp.code)==1){
         mvprintw(23, 2, "Livre supprimer avec succes !");
     }else if (supprimerLivre(supp.code)==4){
-        mvprintw(23, 2, "Livre est emprunter pas des etudiant veuilliez rendres les copies disponibles");
+        mvprintw(23, 2, "Livre est emprunter par des etudiants veuilliez rendres les copies disponibles");
     }else {
         mvprintw(23, 2, "Erreur lors de la suppression !");
     }
