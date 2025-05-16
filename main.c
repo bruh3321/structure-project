@@ -69,7 +69,6 @@ int main() {
                 rechercherLivreGUI();      // Rechercher un livre
                 break;
             case 'q':
-            case 'Q':
                 break;                     // Quitter l'application
             default:
                 mvprintw(23, 2, "Choix invalide !");
@@ -99,7 +98,7 @@ void afficherMenuPrincipal() {
     mvprintw(10, 30, "6. Liste des etudiants");
     mvprintw(11, 30, "7. rechercher un livre");
     
-    mvprintw(11, 30, "Q. Quitter");
+    mvprintw(12, 30, "Q. Quitter");
     
     attron(COLOR_PAIR(2));
     mvprintw(23, 2, "Votre choix : ");
