@@ -145,7 +145,7 @@ int supprimerLivre(const char* codeLivre){
            etd.emprunts[2], etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
            etd.emprunts[6], etd.emprunts[7], etd.emprunts[8], etd.emprunts[9]) == 13){
             for (int i=0; i<10; i++){
-                if (strcmp(etd.emprunts[i],codeLivre)){
+                if (strcmp(etd.emprunts[i],codeLivre) == 0){
                     return 4;
                 }
             }
@@ -173,7 +173,7 @@ int supprimerLivre(const char* codeLivre){
     remove("livres.txt");
     rename("tmp.txt", "livres.txt");
 
-    if (!livre_supprimer) return 1;
+    if (livre_supprimer) return 1;
     return 2;
 }
 
@@ -436,7 +436,7 @@ int rendreLivre(Etudiant* etudiant, const char* codeLivre) {
                 }
             }
         }
-        if(num_emprunt <=10){
+        if(num_emprunt > 10){
             fprintf(etd_emprunt_tmp, "%s %s %s %s %s %s %s %s %s %s %s %s %s\n",
                 etd.prenom, etd.nom, etd.CNIE,
                 etd.emprunts[0], etd.emprunts[1], etd.emprunts[2],
