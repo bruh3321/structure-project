@@ -1,9 +1,8 @@
 #include <ncurses.h>
 #include <string.h>
+#include <stdlib.h>
 #include "storagemanagement.h"
 #include "structs.h"
-#include "string.h"
-#include "stdlib.h"
 #define MAX_SAISIE 100
 
 // Déclaration des tableaux globaux pour les livres et étudiants
@@ -16,6 +15,7 @@ int start_index = 0;         // Index de départ pour le défilement des listes
 // Prototypes des fonctions
 void afficherMenuPrincipal();
 void gererSaisieLivre();
+void gererSuppressionLivre();
 void afficherListeLivres();
 void afficherListeEtudiant();
 void emprunterLivreGUI();
@@ -54,15 +54,18 @@ int main() {
                 afficherListeLivres();      // Afficher la liste des livres
                 break;
             case '3':
-                emprunterLivreGUI();       // Emprunter un livre
+                gererSuppressionLivre();    // Supprime un livre
                 break;
             case '4':
-                retournerLivreGUI();       // Retourner un livre
+                emprunterLivreGUI();       // Emprunter un livre
                 break;
             case '5':
-                afficherListeEtudiant();   // Afficher la liste des étudiants
+                retournerLivreGUI();       // Retourner un livre
                 break;
             case '6':
+                afficherListeEtudiant();   // Afficher la liste des étudiants
+                break;
+            case '7':
                 rechercherLivreGUI();      // Rechercher un livre
                 break;
             case 'q':
@@ -430,4 +433,30 @@ void rechercherLivreGUI() {
     if (livres) libererListe(livres); // Libération de la liste
     noecho();
     curs_set(0);
+}
+/**
+ * interface pour la suppression d'un livre
+ */
+void gererSuppressionLivre(){
+    clear();
+    Livre supp;
+
+    keypad(stdscr, true);
+    echo();
+    curs_set(1);
+
+    mvprintw(2, 30, "Supression de livre (entrer pour sortir)");
+    mvprintw(5, 10, "Code: ");
+    getnstr(supp.code, 9);
+    if (supp.code[0]==0) return;
+
+    if (supprimerLivre(supp.code)){
+        mvprintw(23, 2, "Livre supprimer avec succes !");
+    }else {
+        mvprintw(23, 2, "Erreur lors de la suppression !");
+    }
+
+    noecho();
+    curs_set(0);
+    getch();
 }
