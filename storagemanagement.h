@@ -6,6 +6,7 @@
 
 int chargerLivres(const char* filename, Livre* livres, int* total);
 int sauvegarderLivre(const char* filename, Livre* l);
+int supprimerLivre(const char* codeLivre);
 
 list_simple* rechercherLivres(const char* filename, const char* critere, int type, int* nbTrouves);
 void libererListe(list_simple* tete);

@@ -1,9 +1,8 @@
 #include <ncurses.h>
 #include <string.h>
+#include <stdlib.h>
 #include "storagemanagement.h"
 #include "structs.h"
-#include "string.h"
-#include "stdlib.h"
 #define MAX_SAISIE 100
 
 // Déclaration des tableaux globaux pour les livres et étudiants
@@ -16,6 +15,7 @@ int start_index = 0;         // Index de départ pour le défilement des listes
 // Prototypes des fonctions
 void afficherMenuPrincipal();
 void gererSaisieLivre();
+void gererSuppressionLivre();
 void afficherListeLivres();
 void afficherListeEtudiant();
 void emprunterLivreGUI();
@@ -54,24 +54,27 @@ int main() {
                 afficherListeLivres();      // Afficher la liste des livres
                 break;
             case '3':
-                emprunterLivreGUI();       // Emprunter un livre
+                gererSuppressionLivre();    // Supprime un livre
                 break;
             case '4':
-                retournerLivreGUI();       // Retourner un livre
+                emprunterLivreGUI();       // Emprunter un livre
                 break;
             case '5':
-                afficherListeEtudiant();   // Afficher la liste des étudiants
+                retournerLivreGUI();       // Retourner un livre
                 break;
             case '6':
+                afficherListeEtudiant();   // Afficher la liste des étudiants
+                break;
+            case '7':
                 rechercherLivreGUI();      // Rechercher un livre
                 break;
             case 'q':
-                break;                    // Quitter l'application
+                break;                     // Quitter l'application
             default:
                 mvprintw(23, 2, "Choix invalide !");
                 refresh();
         }
-    } while(choix != 'q');
+    } while(choix != 'q' && choix!='Q');
 
     endwin();  // Restaure les paramètres du terminal
     return 0;
@@ -89,11 +92,13 @@ void afficherMenuPrincipal() {
     // Affichage des options du menu
     mvprintw(5, 30, "1. Ajouter un livre");
     mvprintw(6, 30, "2. Liste des livres");
-    mvprintw(7, 30, "3. Emprunter un livre");
-    mvprintw(8, 30, "4. Retourner un livre");
-    mvprintw(9, 30, "5. Liste des etudiants");
-    mvprintw(10, 30, "6. rechercher un livre");
-    mvprintw(11, 30, "q. Quitter");
+    mvprintw(7, 30, "3. Supprimer un livre");
+    mvprintw(8, 30, "4. Emprunter un livre");
+    mvprintw(9, 30, "5. Retourner un livre");
+    mvprintw(10, 30, "6. Liste des etudiants");
+    mvprintw(11, 30, "7. rechercher un livre");
+    
+    mvprintw(12, 30, "Q. Quitter");
     
     attron(COLOR_PAIR(2));
     mvprintw(23, 2, "Votre choix : ");
@@ -429,4 +434,32 @@ void rechercherLivreGUI() {
     if (livres) libererListe(livres); // Libération de la liste
     noecho();
     curs_set(0);
+}
+/**
+ * interface pour la suppression d'un livre
+ */
+void gererSuppressionLivre(){
+    clear();
+    Livre supp;
+
+    keypad(stdscr, true);
+    echo();
+    curs_set(1);
+
+    mvprintw(2, 30, "Supression de livre (entrer pour sortir)");
+    mvprintw(5, 10, "Code: ");
+    getnstr(supp.code, 9);
+    if (supp.code[0]==0) return;
+
+    if (supprimerLivre(supp.code)==1){
+        mvprintw(23, 2, "Livre supprimer avec succes !");
+    }else if (supprimerLivre(supp.code)==4){
+        mvprintw(23, 2, "Livre est emprunter pas des etudiant veuilliez rendres les copies disponibles");
+    }else {
+        mvprintw(23, 2, "Erreur lors de la suppression !");
+    }
+
+    noecho();
+    curs_set(0);
+    getch();
 }
