@@ -134,9 +134,23 @@ int sauvegarderLivre(const char* filename, Livre *l) {
 /**
  * Supprime un livre dans un fichier
  * @param codeLivre code du livre a supprimer
- * @return 1 si succés, 2 si livre pas present, -1 erreur
+ * @return 1 si succés, 2 si livre pas present, 4 si le livre est emprunter, -1 erreur
  */
 int supprimerLivre(const char* codeLivre){
+    FILE* emprunt=fopen("emprunt.txt", "r");
+    if (emprunt!=NULL){
+        Etudiant etd;
+        while (fscanf(emprunt, "%s %s %s %s %s %s %s %s %s %s %s %s %s", 
+           etd.prenom, etd.nom, etd.CNIE, etd.emprunts[0], etd.emprunts[1],
+           etd.emprunts[2], etd.emprunts[3], etd.emprunts[4], etd.emprunts[5],
+           etd.emprunts[6], etd.emprunts[7], etd.emprunts[8], etd.emprunts[9]) == 13){
+            for (int i=0; i<10; i++){
+                if (etd.emprunts[i]==codeLivre){
+                    return 4;
+                }
+            }
+        }
+    }
     FILE *fichier = fopen("livres.txt", "r");
     if (!fichier) return 1;
 
@@ -274,7 +288,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
     }
     
     Livre livre;
-    char titre_temp[50], auteur_temp[50];
+    
     int book_exists = 0;
     while (fscanf(fichier, "%s %s %s %d %d %d", 
            livre.code, livre.titre, livre.auteur,
@@ -290,7 +304,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
         }
         
         fprintf(tmp, "%s %s %s %d %d %d\n", 
-               livre.code, titre_temp, auteur_temp,
+               livre.code, livre.titre, livre.auteur,
                livre.annee, livre.nbExemplaires, livre.nbExemplairesDisponibles);
     }
     

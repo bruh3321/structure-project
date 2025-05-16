@@ -74,7 +74,7 @@ int main() {
                 mvprintw(23, 2, "Choix invalide !");
                 refresh();
         }
-    } while(choix != 'q' || choix!='Q');
+    } while(choix != 'q' && choix!='Q');
 
     endwin();  // Restaure les paramètres du terminal
     return 0;
@@ -453,6 +453,8 @@ void gererSuppressionLivre(){
 
     if (supprimerLivre(supp.code)){
         mvprintw(23, 2, "Livre supprimer avec succes !");
+    }else if (supprimerLivre(supp.code)==4){
+        mvprintw(23, 2, "Livre est emprunter pas des etudiant veuilliez rendres les copies disponibles");
     }else {
         mvprintw(23, 2, "Erreur lors de la suppression !");
     }
