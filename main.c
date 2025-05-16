@@ -66,12 +66,13 @@ int main() {
                 rechercherLivreGUI();      // Rechercher un livre
                 break;
             case 'q':
-                break;                    // Quitter l'application
+            case 'Q':
+                break;                     // Quitter l'application
             default:
                 mvprintw(23, 2, "Choix invalide !");
                 refresh();
         }
-    } while(choix != 'q');
+    } while(choix != 'q' || choix!='Q');
 
     endwin();  // Restaure les paramètres du terminal
     return 0;
@@ -93,7 +94,7 @@ void afficherMenuPrincipal() {
     mvprintw(8, 30, "4. Retourner un livre");
     mvprintw(9, 30, "5. Liste des etudiants");
     mvprintw(10, 30, "6. rechercher un livre");
-    mvprintw(11, 30, "q. Quitter");
+    mvprintw(11, 30, "Q. Quitter");
     
     attron(COLOR_PAIR(2));
     mvprintw(23, 2, "Votre choix : ");
