@@ -54,7 +54,7 @@ int main() {
                 afficherListeLivres();      // Afficher la liste des livres
                 break;
             case '3':
-                gererSuppressionLivre();    // Supprime un livre
+                gererSuppressionLivre();    // Supprimer un livre
                 break;
             case '4':
                 emprunterLivreGUI();       // Emprunter un livre
@@ -86,18 +86,17 @@ int main() {
 void afficherMenuPrincipal() {
     clear();
     attron(COLOR_PAIR(1));
-    mvprintw(2, 35, "GESTION BIBLIOTHEQUE");
+    mvprintw(2, 35, "GESTION DE LA BIBLIOTHÈQUE");
     attroff(COLOR_PAIR(1));
 
     // Affichage des options du menu
     mvprintw(5, 30, "1. Ajouter un livre");
-    mvprintw(6, 30, "2. Liste des livres");
+    mvprintw(6, 30, "2. Afficher la liste des livres");
     mvprintw(7, 30, "3. Supprimer un livre");
     mvprintw(8, 30, "4. Emprunter un livre");
     mvprintw(9, 30, "5. Retourner un livre");
-    mvprintw(10, 30, "6. Liste des etudiants");
-    mvprintw(11, 30, "7. rechercher un livre");
-    
+    mvprintw(10, 30, "6. Afficher la liste des étudiants");
+    mvprintw(11, 30, "7. Rechercher un livre");
     mvprintw(12, 30, "Q. Quitter");
     
     attron(COLOR_PAIR(2));
@@ -118,7 +117,7 @@ void gererSaisieLivre() {
     curs_set(1);
     
     // Saisie des informations du livre
-    mvprintw(2, 30, "NOUVEAU LIVRE (entrer pour sortir)");
+    mvprintw(2, 30, "NOUVEAU LIVRE (Entrée pour quitter)");
     mvprintw(5, 10, "Code : ");
     getnstr(nouveau.code, 9);
     if (nouveau.code[0]==0) return;  // Sortie si champ vide
@@ -131,11 +130,11 @@ void gererSaisieLivre() {
     getnstr(nouveau.auteur, 49);
     if (nouveau.auteur[0]==0) return;
     
-    mvprintw(8, 10, "Annee : ");
+    mvprintw(8, 10, "Année : ");
     scanw("%d", &nouveau.annee);
     if (nouveau.annee==0) return;
     
-    mvprintw(9, 10, "Exemplaires : ");
+    mvprintw(9, 10, "Nombre d'exemplaires : ");
     scanw("%d", &nouveau.nbExemplaires);
     if (nouveau.nbExemplaires==0) return;
     
@@ -143,7 +142,7 @@ void gererSaisieLivre() {
     
     // Sauvegarde du livre
     if(sauvegarderLivre("livres.txt", &nouveau)) {
-        mvprintw(23, 2, "Livre enregistre avec succes !");
+        mvprintw(23, 2, "Livre enregistré avec succès !");
     }else {
         mvprintw(23, 2, "Erreur lors de l'enregistrement !");
     }
@@ -169,13 +168,13 @@ void afficherListeLivres() {
         int max_lines = LINES - 6;
         for(int i = 0; i < max_lines && (i + start_index) < total_livres; i++) {
             Livre *l = &livres[i + start_index];
-            mvprintw(5 + i, 3, "%s - %s (%s) | Disp: %d/%d",
+            mvprintw(5 + i, 3, "%s - %s (%s) | Dispo : %d/%d",
                     l->code, l->titre, l->auteur, 
                     l->nbExemplairesDisponibles, l->nbExemplaires);
         }
 
         // Instructions pour l'utilisateur
-        mvprintw(LINES - 2, 2, "↑/↓: Defilement | R: Retour");
+        mvprintw(LINES - 2, 2, "↑/↓ : Défilement | R : Retour");
         refresh();
         
         // Gestion des touches de défilement
@@ -210,7 +209,7 @@ void emprunterLivreGUI(){
     curs_set(1);
     
     // Saisie des informations
-    mvprintw(2, 30, "EMPRUNT DE LIVRE ou entrer pour quitter ce menu");
+    mvprintw(2, 30, "EMPRUNT DE LIVRE (Entrée pour quitter ce menu)");
     mvprintw(5, 10, "Code du livre : ");
     getnstr(codeLivre, 9);
     if (codeLivre[0]==0) return;
@@ -223,7 +222,7 @@ void emprunterLivreGUI(){
     getnstr(etd.nom, 30);
     if (etd.nom[0]==0) return;
 
-    mvprintw(11, 10, "Prenom : ");
+    mvprintw(11, 10, "Prénom : ");
     getnstr(etd.prenom, 30);
     if (etd.prenom[0]==0) return;
 
@@ -232,11 +231,11 @@ void emprunterLivreGUI(){
 
     // Affichage du résultat
     if(etat_emprunt == 0){
-        mvprintw(23, 4, "Emprunt effectue avec succes !");
+        mvprintw(23, 4, "Emprunt effectué avec succès !");
     }else if(etat_emprunt == 1){
-        mvprintw(23, 4, "ther is no book with this code");
+        mvprintw(23, 4, "Aucun livre avec ce code n'existe !");
     }else if(etat_emprunt == 2){
-        mvprintw(23, 4, "no copies available");
+        mvprintw(23, 4, "Aucune copie disponible !");
     }else{
         mvprintw(23, 4, "Erreur lors de l'emprunt !");
     }
@@ -266,7 +265,7 @@ void retournerLivreGUI(){
     
     // Tentative de retour
     if(!rendreLivre(&etd, codeLivre)){
-        mvprintw(23, 4, "Retour effectue avec succes !");
+        mvprintw(23, 4, "Retour effectué avec succès !");
     }else{
         mvprintw(23, 4, "Erreur lors du retour !");
     }
@@ -285,7 +284,7 @@ void afficherListeEtudiant() {
     
     do {
         clear();
-        mvprintw(2, 35, "LISTE DES ETUDIANT (%d/%d)", start_index + 1, total_etudiants);
+        mvprintw(2, 35, "LISTE DES ÉTUDIANTS (%d/%d)", start_index + 1, total_etudiants);
         
         int max_lines = LINES - 6;
         for(int i = 0; i < max_lines && (i + start_index) < total_etudiants; i++) {
@@ -299,15 +298,15 @@ void afficherListeEtudiant() {
             
             // Affichage selon le nombre d'emprunts
             if (books_count == 0) {
-                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: Aucun",
+                mvprintw(5 + i, 3, "%s - %s %s | Emprunts : Aucun",
                         l->CNIE, l->nom, l->prenom);
             } else {
-                mvprintw(5 + i, 3, "%s - %s %s | Emprunts: %s (+%d restant(s) ouvert(s))",
+                mvprintw(5 + i, 3, "%s - %s %s | Emprunts : %s (+%d restant(s) ouvert(s))",
                         l->CNIE, l->nom, l->prenom, l->emprunts[0], books_count-1);
             }
         }
         
-        mvprintw(LINES - 2, 2, "↑/↓: Defilement | R: Retour");
+        mvprintw(LINES - 2, 2, "↑/↓ : Défilement | R : Retour");
         refresh();
         
         ch = getch();
@@ -350,7 +349,7 @@ void rechercherLivreGUI() {
     mvprintw(6, 10, "3. Annee");
     mvprintw(7, 10, "0. Code");
     mvprintw(8, 10, "4. Retour au menu principal");
-    mvprintw(10, 10, "Choix : ");
+    mvprintw(10, 10, "Votre choix : ");
     refresh();
 
     int choix = getch() - '0';
@@ -358,7 +357,7 @@ void rechercherLivreGUI() {
     if (choix == 4) return;
 
     clear();
-    mvprintw(2, 30, "RECHERCHER UN LIVRE (Entrer pour quitter)");
+    mvprintw(2, 30, "RECHERCHER UN LIVRE (Entrée pour quitter)");
 
     switch (choix) {
         case 1:
@@ -372,7 +371,7 @@ void rechercherLivreGUI() {
             livres = rechercherLivres("livres.txt", critere, 2, &nbTrouves);
             break;
         case 3:
-            mvprintw(4, 30, "Annee : ");
+            mvprintw(4, 30, "Année : ");
             getnstr(critere, 4);
             livres = rechercherLivres("livres.txt", critere, 3, &nbTrouves);
             break;
@@ -400,12 +399,12 @@ void rechercherLivreGUI() {
             int max_lines = LINES - 6;
             for (int i = 0; i < max_lines && (i + start_index) < nbTrouves; i++) {
                 Livre *l = tableau[i + start_index];
-                mvprintw(5 + i, 3, "%s - %s (%s) | Annee: %d | Disp: %d/%d",
+                mvprintw(5 + i, 3, "%s - %s (%s) | Année : %d | Dispo : %d/%d",
                          l->code, l->titre, l->auteur, l->annee,
                          l->nbExemplairesDisponibles, l->nbExemplaires);
             }
 
-            mvprintw(LINES - 2, 2, "↑/↓: Defilement | PgUp/PgDn: Page | R: Retour");
+            mvprintw(LINES - 2, 2, "↑/↓ : Défilement | PgUp/PgDn : Page | R : Retour");
             refresh();
 
             ch = getch();
@@ -436,7 +435,7 @@ void rechercherLivreGUI() {
     curs_set(0);
 }
 /**
- * interface pour la suppression d'un livre
+ * Interface pour la suppression d'un livre
  */
 void gererSuppressionLivre(){
     clear();
@@ -446,15 +445,16 @@ void gererSuppressionLivre(){
     echo();
     curs_set(1);
 
-    mvprintw(2, 30, "Supression de livre (entrer pour sortir)");
-    mvprintw(5, 10, "Code: ");
+    mvprintw(2, 30, "SUPPRESSION DE LIVRE (Entrée pour quitter)");
+    mvprintw(5, 10, "Code : ");
     getnstr(supp.code, 9);
     if (supp.code[0]==0) return;
 
-    if (supprimerLivre(supp.code)==1){
-        mvprintw(23, 2, "Livre supprimer avec succes !");
-    }else if (supprimerLivre(supp.code)==4){
-        mvprintw(23, 2, "Livre est emprunter par des etudiants veuilliez rendres les copies disponibles");
+    int res = supprimerLivre(supp.code);
+    if (res==1){
+        mvprintw(23, 2, "Livre supprimé avec succès !");
+    }else if (res==4){
+        mvprintw(23, 2, "Le livre est emprunté par des étudiants, veuillez rendre toutes les copies disponibles.");
     }else {
         mvprintw(23, 2, "Erreur lors de la suppression !");
     }

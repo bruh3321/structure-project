@@ -28,7 +28,7 @@ int chargerLivres(const char* filename, Livre *livres, int *total) {
                &livres[*total].nbExemplaires, 
                &livres[*total].nbExemplairesDisponibles) == 6) {
             
-            // Convert asterisks back to spaces
+            // Remplace les astérisques par des espaces
             strcpy(livres[*total].titre, titre_temp);
             strcpy(livres[*total].auteur, auteur_temp);
             for (int i = 0; livres[*total].titre[i]; i++) 
@@ -76,7 +76,7 @@ int chargerEtudiant(const char* filename, Etudiant *etudiants, int *total) {
         strncpy(etudiants[*total].nom, nom, sizeof(etudiants[*total].nom) - 1);
         strncpy(etudiants[*total].CNIE, cnie, sizeof(etudiants[*total].CNIE) - 1);
 
-        // Parse les emprunts de livres
+        // Parcours les emprunts de livres
         char *ptr = line;
         // Saute les trois premiers champs
         for (int i = 0; i < 3; i++) {
@@ -84,7 +84,7 @@ int chargerEtudiant(const char* filename, Etudiant *etudiants, int *total) {
             ptr += strspn(ptr, " \t");   // Saute les espaces
         }
 
-        // Parse jusqu'à 10 codes de livre
+        // Parcours jusqu'à 10 codes de livre
         for (int i = 0; i < 10 && *ptr != '\0' && *ptr != '\n'; i++) {
             int len = strcspn(ptr, " \t\n");
             if (len > 0) {
@@ -114,7 +114,7 @@ int sauvegarderLivre(const char* filename, Livre *l) {
         return 0;
     }
     
-    // Replace spaces with asterisks in title and author
+    // Remplace les espaces par des astérisques dans le titre et l'auteur
     char titre_temp[50], auteur_temp[50];
     strcpy(titre_temp, l->titre);
     strcpy(auteur_temp, l->auteur);
@@ -146,6 +146,7 @@ int supprimerLivre(const char* codeLivre){
            etd.emprunts[6], etd.emprunts[7], etd.emprunts[8], etd.emprunts[9]) == 13){
             for (int i=0; i<10; i++){
                 if (strcmp(etd.emprunts[i],codeLivre) == 0){
+                    // Le livre est actuellement emprunté
                     return 4;
                 }
             }
@@ -275,7 +276,7 @@ void libererListe(list_simple* tete) {
  * Permet à un étudiant d'emprunter un livre
  * @param etudiant Pointeur vers l'étudiant
  * @param codeLivre Code du livre à emprunter
- * @return 1 si succès, 2 si pas d'exemplaires disponibles, -1 si erreur
+ * @return 1 si le livre n'existe pas, 2 si pas d'exemplaires disponibles, -1 si erreur, 1 si succès
  */
 int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
     FILE *fichier = fopen("livres.txt", "r");
@@ -341,7 +342,8 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
                 }
             }
             if (!added) {
-                printf("Erreur: Maximum de livres empruntés\n");
+                // Erreur : nombre maximum de livres empruntés atteint
+                printf("Erreur : nombre maximum de livres empruntés atteint\n");
             }
         }
 
@@ -370,7 +372,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
         }
     }
     
-    return 1; //succès
+    return 1; // succès
 }
 
 /**
