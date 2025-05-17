@@ -174,7 +174,7 @@ int supprimerLivre(const char* codeLivre){
     remove("livres.txt");
     rename("tmp.txt", "livres.txt");
 
-    if (livre_supprimer) return 1;
+    if (livre_supprimer) return 0;
     return 2;
 }
 
