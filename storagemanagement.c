@@ -174,7 +174,7 @@ int supprimerLivre(const char* codeLivre){
     remove("livres.txt");
     rename("tmp.txt", "livres.txt");
 
-    if (livre_supprimer) return 0;
+    if (livre_supprimer) return 1;
     return 2;
 }
 
@@ -372,7 +372,7 @@ int emprunterLivre(Etudiant* etudiant, const char* codeLivre) {
         }
     }
     
-    return 1; // succès
+    return 0; // succès
 }
 
 /**
